@@ -86,6 +86,8 @@ class LocationsController extends Controller
         $location->name = $request->input('name');
         $location->capacity = $request->input('capacity');
         $location->address = $request->input('address');
+        $location->type = $request->input('room_type');
+        $location->type = $request->input('room_rate');
         $location->save();
 
         return redirect('/locations')->with('success','location updated');
