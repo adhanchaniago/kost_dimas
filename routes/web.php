@@ -45,3 +45,7 @@ Route::get('/receipt','InvoiceController@receipt_index');
 
 Route::post('/receipt/create','InvoiceController@generateReceipt');
 
+Route::get('/attendance/report','AttendanceController@createReport');
+
+Route::post('/attendance/report','AttendanceController@generateReport');
+
