@@ -16,6 +16,17 @@
                     </div>
                 </div>
             </div>
+            <div class="panel panel-default">
+                <div class="panel-heading">Create Reports</div>
+
+                <div class="panel-body">
+                    <ul>
+                        <li><a href="/invoice" class="btn btn-primary">Create Invoice</a></li>
+                        <li><a href="/attendance/report" class="btn btn-primary">Create LB</a></li>
+                        <li><a href="/receipt" class="btn btn-primary">Create Receipt</a></li>
+                    </ul>
+                </div>
+            </div>
         </div>
         <div class="col-sm-4">
             <div class="panel panel-default">

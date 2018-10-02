@@ -71,26 +71,37 @@ class AttendanceController extends Controller
 
     public function record(){
         
-        return view('attendance.recordForm');
+        $locations = Location::where('deleted_at',NULL)->get();
+        return view('attendance.recordForm')->with('locations',$locations);
         
     }
 
     public function showRecord(Request $request){
         $this->validate($request,[          
           'room_location' => 'required',
-          'start_date' => 'required'
+          'atd_date' => 'required'
         ]);
         $date = ('Y-m-d');
-        // $entry_date = Guest::where('deleted_at',NULL)->get();
-        $room = $request->input('room_location');
-        $location = Location::where('id',$request->input('room_location'))->first();
-        $room_location = $location->name;
-        $atd_date = $request->input('atd_date');
-        $attendances = Attendance::where('room_location',$room)->where('atd_date',$atd_date)->get();
-        // foreach($attendances as $attendance){
-        //     echo $attendance->guest->name;
-        // }
-        return view('attendance.record')->with('attendances',$attendances)->with('room_location',$room_location)->with('atd_date',$atd_date);
+        
+        if($request->input('room_location') == -1){
+            
+            $room_location = "All Location";
+            $atd_date = $request->input('atd_date');
+            $attendances = Attendance::where('atd_date',$atd_date)->get();
+            
+            return view('attendance.record')->with('attendances',$attendances)->with('room_location',$room_location)->with('atd_date',$atd_date);
+        }
+        else{
+
+            $room = $request->input('room_location');
+            $location = Location::where('id',$request->input('room_location'))->first();
+            $room_location = $location->name;
+            $atd_date = $request->input('atd_date');
+            $attendances = Attendance::where('room_location',$room)->where('atd_date',$atd_date)->get();
+            
+            return view('attendance.record')->with('attendances',$attendances)->with('room_location',$room_location)->with('atd_date',$atd_date);
+        }
+        
 
     }
 
@@ -108,7 +119,7 @@ class AttendanceController extends Controller
         $date = date("j F Y");
         $month = date("F");
         $mpdf = new \Mpdf\Mpdf();
-
+        
         //$content = "";
         foreach($locations as $location){
             $content = 

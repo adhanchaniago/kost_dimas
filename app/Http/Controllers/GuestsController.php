@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Guest;
 use App\Location;
+use App\RoomDetail;
 
 class GuestsController extends Controller
 {
@@ -19,8 +20,15 @@ class GuestsController extends Controller
         return view('Guests.index')->with('guests',$guests)->with('locations',$locations);
     }
 
-    public function create(){
-        return view('Guests.create');
+    public function create(Request $request){
+        $location = Location::find($request->input('room_location'));
+        $room_details = RoomDetail::where('room_location',$location->id)->get();
+        return view('Guests.create')->with('location',$location)->with('room_details',$room_details);
+    }
+
+    public function get_room(){
+        $locations = Location::where('deleted_at',NULL)->get();
+        return view('Guests.precreate')->with('locations',$locations);
     }
 
     public function store(Request $request){
@@ -72,6 +80,8 @@ class GuestsController extends Controller
         $guest->room_location = $request->input('room_location');
         $guest->room_number = $request->input('room_number');
         $guest->description = $request->input('description');
+        $guest->nationality = $request->input('nationality');
+        $guest->room_type = $request->input('room_type');
         $guest->save();
 
         return redirect('/guests')->with('success','Guest Successfully Added');

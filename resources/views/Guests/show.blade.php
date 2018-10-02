@@ -2,7 +2,7 @@
 @include('includes.navbar')
 
 @section('content')
-    <a href="{{ route('guests.index') }}" class="btn btn-Primary">Back</a>
+    <a href="guests" class="btn btn-Primary">Back</a>
     <h1>{{$guest->name}} Detail</h1>
     <table class="table table-striped">
         <tr>
@@ -26,7 +26,7 @@
     </table>
     <div class="col-sm-6">
         
-        <a href="{{ route('guests.edit', $guest) }}" class="btn btn-warning">Edit</a>
+        <a href="guests/{{$guest->id}}/edit" class="btn btn-warning">Edit</a>
         
     </div>
     <div class="col-sm-6">

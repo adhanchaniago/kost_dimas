@@ -34,7 +34,12 @@
             </div>
             <div class="form-group">
                 {{Form::label('invoiceDetailID', 'Invoice Detail ID')}}
-                {{Form::number('invoiceDetailID','',['class'=>'form-control'])}}
+                {{--  {{Form::number('invoiceDetailID','',['class'=>'form-control'])}}  --}}
+                <select name="invoiceDetailID" class="form-control">
+                    @foreach($invoice_details as $invoice_detail)
+                        <option value="{{$invoice_detail->id}}">{{$invoice_detail->leg_code}}</option>
+                    @endforeach
+                </select>
             </div>
             {{Form::hidden('_method','POST')}}
             {{Form::submit('Submit',['class'=>'btn btn-primary form-control'])}}

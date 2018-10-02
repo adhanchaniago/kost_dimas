@@ -19,7 +19,24 @@ Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
 
-Route::resource('guests','GuestsController');
+// Route::resource('guests','GuestsController');
+
+Route::get('guests','GuestsController@index');
+
+Route::get('guests/get_room','GuestsController@get_room');
+
+Route::post('guests/get_room','GuestsController@create');
+
+Route::post('guests/create','GuestsController@store');
+
+Route::get('guests/{id}','GuestsController@show');
+
+Route::get('guests/{id}/edit','GuestsController@edit');
+
+Route::post('guests/{id}/edit','GuestsController@update');
+
+Route::delete('guests/{id}','GuestsController@destroy');
+
 
 Route::resource('locations','LocationsController');
 

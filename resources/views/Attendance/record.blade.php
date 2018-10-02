@@ -2,10 +2,11 @@
 @extends('layouts.app')
 @include('includes.navbar')
 @section('content')
-    <h1>Attendance on  {{$atd_date}}</h1> 
+    <h1>{{$room_location}} Attendance on  {{$atd_date}}</h1> 
         <table class="table table-striped">
             <tr>
                 <th>Name</th>
+                <th>Location</th>
                 <th>Room Number</th>
                 <th>ID</th>
                 <th>Entry Date</th>
@@ -15,6 +16,7 @@
             @foreach($attendances as $attendance)
             <tr>
                 <td>{{$attendance->guest->name}}</td>
+                <td>{{$attendance->location->name}}</td>
                 <td>{{$attendance->guest->room_number}}</td>
                 <td><img src="../../../<?php echo $attendance->guest->id_path; ?>" style="height:200px;width:300px;"></td>
                 <td>{{$attendance->guest->entry_date}}</td>

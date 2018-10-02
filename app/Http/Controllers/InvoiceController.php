@@ -6,12 +6,14 @@ use App\Guest;
 use App\Location;
 use App\Invoice;
 use App\InvoiceDetail;
+use App\RoomDetail;
 
 class InvoiceController extends Controller
 {
     public function index(){
         $locations = Location::where('deleted_at',NULL)->get();
-        return view('Invoices.index')->with('locations',$locations);
+        $invoice_details = InvoiceDetail::all();
+        return view('Invoices.index')->with('locations',$locations)->with('invoice_details',$invoice_details);
     }
 
     public function enterSettings(){
@@ -60,15 +62,19 @@ class InvoiceController extends Controller
       $endDate = date_create(date('Y-m-d'));
     }
 
+    //In the case if Kertamukti, append guests from Ketamukti II to the array. On room change, create an if that if location is different,
+    //print out pro rate contents, add new header for KM II and continue the loop
+
     $locationID = $request -> input('locationID');
-    $dailyPrice = 500;
-    $monthlyPrice = 300;
     $sum = 0;
     $guests = Guest::where('room_location', $locationID)->where('deleted_at',NULL)->orderBy('room_number')->get();
+    if($locationID == 1){
+      $guests = Guest::where('room_location', '1')->where('deleted_at', NULL)->orWhere('room_location', '2')->where('deleted_at', NULL)->orderBy('room_location')->orderBy('room_number')->get();
+    }
     $location = Location::where('id', $locationID)->first();
     $invoiceDetail = InvoiceDetail::where('id', $request -> input('invoiceDetailID'))->first();
-
-    $mpdf = new \Mpdf\Mpdf();
+    $currentRoomType = RoomDetail::where('id', $locationID)->first();
+    $i = 0;
 
     $content = '
     <columns column-count="3" vAlign="" column-gap="5" />
@@ -129,7 +135,7 @@ class InvoiceController extends Controller
           <th>1.</th>
           <th>'.$location->name.'</th>
           <th>'.$location->capacity.'</th>
-          <th>Room</th>
+          <th>'.$currentRoomType->room_type.'</th>
           <th></th>
           <th></th>
       </tr>';
@@ -144,8 +150,8 @@ class InvoiceController extends Controller
 
       if($guests->room_number != $currentRoom){
           if($occupant != null){
-            $occupancy = date_diff($occStart, $occEnd)->format("%a");
-            $totalPrice = $occupancy * $monthlyPrice;
+            $occupancy = date_diff($occStart, $occEnd)->format("%a") + 1;
+            $totalPrice = $occupancy * $currentRoomType->monthly_rate;
             $sum += $totalPrice;
 
             $content .= "<tr>
@@ -153,9 +159,88 @@ class InvoiceController extends Controller
             <td>".$currentRoom.".".$occupant."</td>
             <td></td>
             <td></td>
-            <td>".$monthlyPrice."</td>
-            <td>".$totalPrice."</td>
+            <td>".number_format($currentRoomType->monthly_rate)."</td>
+            <td>".number_format($totalPrice)."</td>
             </tr>";
+          }
+
+          if($guests->room_type != $currentRoomType->id){
+            if($guests->room_location != $currentRoomType->room_location){
+              $counter = 2;
+              foreach($prorate as $guests){
+                $guestEntry = date_create($guests->entry_date);
+
+                if($guests->exit_date != null){
+                  $exitDate = date_create($guests->exit_date);
+
+                  if(date_diff($guestEntry, $startDate)->format("%a") <= 0){
+                    $duration = date_diff($startDate, $exitDate);
+                  }
+                  else{
+                    $duration = date_diff($guestEntry, $exitDate);
+                  }
+                }
+                else{
+                  if(date_diff($guestEntry, $startDate)->format("%a") <= 0){
+                    $duration = date_diff($startDate, $endDate);
+                  }
+                  else{
+                    $duration = date_diff($guestEntry, $endDate);
+                  }
+                }
+
+                $currentRoomType = RoomDetail::where('id', $guests->room_type)->first();
+                $totalPrice = $duration->format("%a") * $currentRoomType->daily_rate;
+                $sum += $totalPrice;
+
+                if($counter == 2){
+                  $content .= "<tr>
+                  <td>".$counter.".</td>
+                  <td> Prorate ".$duration->format("%a")." days in room ".$guests->room_number."<br>".$guests->name."</td>
+                  <td></td>
+                  <td></td>
+                  <td>".number_format($currentRoomType->daily_rate)."</td>
+                  <td>".number_format($totalPrice)."</td>
+                  </tr>";
+                }
+                else{
+                  $content .= "<tr>
+                  <td></td>
+                  <td> Prorate ".$duration->format("%a")." days in room ".$guests->room_number."<br>".$guests->name."</td>
+                  <td></td>
+                  <td></td>
+                  <td>".number_format($currentRoomType->daily_rate)."</td>
+                  <td>".number_format($totalPrice)."</td>
+                  </tr>";
+                }
+              }
+
+              $prorate = array();
+              $location = Location::where('id', $guests->room_location)->first();
+              $currentRoomType = RoomDetail::where('id', $guests->room_type)->first();
+
+              $content .= '
+                <tr>
+                    <th>1.</th>
+                    <th>'.$location->name.'</th>
+                    <th>'.$location->capacity.'</th>
+                    <th>'.$currentRoomType->room_type.'</th>
+                    <th></th>
+                    <th></th>
+                </tr>';
+            }
+
+            $currentRoomType = RoomDetail::where('id', $guests->room_type)->first();
+
+            $content .= '
+              <tr>
+                  <th></th>
+                  <th></th>
+                  <th></th>
+                  <th>'.$currentRoomType->room_type.'</th>
+                  <th></th>
+                  <th></th>
+              </tr>';
           }
 
           $currentRoom = $guests->room_number;
@@ -170,7 +255,7 @@ class InvoiceController extends Controller
           if($guests->exit_date != null){
             $exitDate = date_create($guests->exit_date);
 
-            if(date_diff($guestEntry, $startDate)->format("%a") <= 0){
+            if(date_diff($guestEntry, $startDate)->format("%a") >= 0){
               $duration = date_diff($startDate, $exitDate);
             }
             else{
@@ -178,7 +263,7 @@ class InvoiceController extends Controller
             }
           }
           else{
-            if(date_diff($guestEntry, $startDate) <= 0){
+            if(date_diff($guestEntry, $startDate)->format("%a") <= 0){
               $duration = date_diff($startDate, $endDate);
             }
             else{
@@ -186,7 +271,7 @@ class InvoiceController extends Controller
             }
           }
 
-          if(date_diff($guestEntry, $startDate)->format("%a") <= 0 || $occStart == $startDate){
+          if(date_diff($guestEntry, $startDate)->format("%a") >= 0 || $occStart == $startDate){
             $occStart = $startDate;
           }
           else if ($occStart == null) {
@@ -220,8 +305,8 @@ class InvoiceController extends Controller
 
       if(++$i == $last){
           if($occupant != null){
-            $occupancy = date_diff($occStart, $occEnd)->format("%a");
-            $totalPrice = $occupancy * $monthlyPrice;
+            $occupancy = date_diff($occStart, $occEnd)->format("%a") + 1;
+            $totalPrice = $occupancy * $currentRoomType->monthly_rate;
             $sum += $totalPrice;
 
             $content .= "<tr>
@@ -229,8 +314,8 @@ class InvoiceController extends Controller
             <td>".$currentRoom.".".$occupant."</td>
             <td></td>
             <td></td>
-            <td>".$monthlyPrice."</td>
-            <td>".$totalPrice."</td>
+            <td>".number_format($currentRoomType->monthly_rate)."</td>
+            <td>".number_format($totalPrice)."</td>
             </tr>";
           }
 
@@ -256,7 +341,7 @@ class InvoiceController extends Controller
         }
       }
       else{
-        if(date_diff($guestEntry, $startDate) <= 0){
+        if(date_diff($guestEntry, $startDate)->format("%a") <= 0){
           $duration = date_diff($startDate, $endDate);
         }
         else{
@@ -264,28 +349,32 @@ class InvoiceController extends Controller
         }
       }
 
-      $totalPrice = $duration->format("%a") * $dailyPrice;
-      $sum += $totalPrice;
+      if($exitDate < $startDate){        
+        $currentRoomType = RoomDetail::where('id', $guests->room_type)->first();
+        $totalPrice = $duration->format("%a") * $currentRoomType->daily_rate;
+        $sum += $totalPrice;
 
-      if($counter == 2){
-        $content .= "<tr>
-        <td>".$counter.".</td>
-        <td> Prorate ".$duration->format("%a")." days in room ".$guests->room_number."<br>".$guests->name."</td>
-        <td></td>
-        <td></td>
-        <td>".$dailyPrice."</td>
-        <td>".$totalPrice."</td>
-        </tr>";
-      }
-      else{
-        $content .= "<tr>
-        <td></td>
-        <td> Prorate ".$duration->format("%a")." days in room ".$guests->room_number."<br>".$guests->name."</td>
-        <td></td>
-        <td></td>
-        <td>".$dailyPrice."</td>
-        <td>".$totalPrice."</td>
-        </tr>";
+        if($counter == 2){
+          $content .= "<tr>
+          <td>".$counter.".</td>
+          <td> Prorate ".$duration->format("%a")." days in room ".$guests->room_number."<br>".$guests->name."</td>
+          <td>".date_diff($exitDate, $startDate)->format('%a')."</td>
+          <td></td>
+          <td>".number_format($currentRoomType->daily_rate)."</td>
+          <td>".number_format($totalPrice)."</td>
+          </tr>";
+          $counter++;
+        }
+        else{
+          $content .= "<tr>
+          <td></td>
+          <td> Prorate ".$duration->format("%a")." days in room ".$guests->room_number."<br>".$guests->name."</td>
+          <td></td>
+          <td></td>
+          <td>".number_format($currentRoomType->daily_rate)."</td>
+          <td>".number_format($totalPrice)."</td>
+          </tr>";
+        }
       }
     }
 
@@ -296,7 +385,7 @@ class InvoiceController extends Controller
       <td></td>
       <td></td>
       <td></td>
-      <td>".$sum."</td>
+      <td>".number_format($sum)."</td>
     </tr></table></div>
     <div>
       <columns column-count='2' />

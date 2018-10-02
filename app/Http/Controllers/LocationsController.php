@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Location;
 use App\Guest;
+use App\RoomDetail;
 
 class LocationsController extends Controller
 {
@@ -59,7 +60,7 @@ class LocationsController extends Controller
 
     public function edit($id){
         $location = Location::find($id);
-
+        $room_details = RoomDetail::where('room_location',$id)->get();
         if($location!=NULL){
             $deldate = $location->deleted_at;
             
@@ -67,7 +68,7 @@ class LocationsController extends Controller
                 return redirect('/locations')->with('error','The data has been deleted');
             }
             else{
-                return view('locations.edit')->with('location',$location);
+                return view('locations.edit')->with('location',$location)->with('room_details',$room_details);
             }
 
         }
@@ -79,16 +80,27 @@ class LocationsController extends Controller
     public function update(Request $request, $id){
         $this->validate($request,[
           'name' => 'required',
-          'capacity' => 'required'
+          'total_capacity' => 'required'
         ]);
+        
+        $type_array = array();
+        $type_array = $request->input('room_type');
 
         $location = Location::find($id);
         $location->name = $request->input('name');
-        $location->capacity = $request->input('capacity');
+        $location->capacity = $request->input('total_capacity');
         $location->address = $request->input('address');
-        $location->type = $request->input('room_type');
-        $location->type = $request->input('room_rate');
         $location->save();
+
+        $room_details = RoomDetail::where('room_location',$id)->get();
+        
+        $x = 0;
+        
+        foreach($room_details as $room_detail){
+            $room_detail->room_type = $type_array[$x];
+            $room_detail->save();
+            $x++;
+        }
 
         return redirect('/locations')->with('success','location updated');
     }
