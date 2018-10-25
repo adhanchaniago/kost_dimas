@@ -3,7 +3,7 @@
 @include('includes.navbar')
 @section('content')
     <h1>Edit Guest Data</h1>
-    {!! Form::open(['action' => ['GuestsController@update',$guest->id], 'method' => 'PUT']) !!}
+    {!! Form::open(['action' => ['GuestsController@update',$guest->id], 'method' => 'POST']) !!}
     {{--  <div class="form-group">
       {{Form::label('room_number', 'Room Number')}}
       {{Form::select('room_number',[1=>'Pendapatan Pribadi',2=>'Tambahan Modal', 3=>'Lain - Lain'],'',['class'=>'form-control'])}}
@@ -24,11 +24,15 @@
       {{Form::label('description', 'Description')}}
       {{Form::textarea('description',$guest->description,['class'=>'form-control'])}}
     </div>
+    {{--  <div class="form-group">
+      {{Form::label('room_location', 'Room Location')}}
+      
+    </div>  --}}
     <div class="form-group">
       {{Form::label('room_number', 'Room Number')}}
       {{Form::number('room_number',$guest->room_number,['class'=>'form-control'])}}
     </div>
-    {{Form::hidden('_method','PUT')}}
+    {{Form::hidden('_method','POST')}}
     {{Form::submit('Submit',['class'=>'btn btn-primary form-control'])}}
   {!! Form::close() !!}
 @endsection

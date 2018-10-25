@@ -18,7 +18,7 @@ class InvoiceController extends Controller
 
     public function enterSettings(){
         $invoice_detail = InvoiceDetail::orderBy('created_at','desc')->first();
-        
+
         return view('Invoices.setting')->with('invoice_detail',$invoice_detail);
     }
 
@@ -77,6 +77,13 @@ class InvoiceController extends Controller
       $invoiceDetail = InvoiceDetail::orderBy('created_at', 'desc')->first();
     }
 
+    if($request->input('dueDate') != null){
+      $dueDate = $request->input('dueDate');
+    }
+    else{
+      $dueDate = date_format($endDate,'Y-m-d');
+    }
+
     $invoiceCode = $location->code.'. / T.'.$this->numberToRoman(date_format($endDate, 'm')).' / '.date_format($endDate, 'm / Y');
     $currentRoomType = RoomDetail::where('id', $locationID)->first();
     $i = 0;
@@ -115,7 +122,7 @@ class InvoiceController extends Controller
           : '.$invoiceDetail->co_no.'<br>
           : '.$invoiceDetail->leg_code.'<br>
           : '.date_format($startDate,'d').' - '.date_format($endDate, 'd-m-Y').'<br>
-          : '.date_format($endDate,'Y-m-d').'
+          : '.$dueDate.'
         </p>
       </div>
       <columns column-count="2" />
@@ -231,6 +238,11 @@ class InvoiceController extends Controller
                     <td>".number_format($totalPrice)."</td>
                     </tr>";
                   }
+                }
+
+                if($exitDate != null){
+                  $guests->deleted_at = date('Y-m-d');
+                  $guests->save();
                 }
               }
 
@@ -420,6 +432,11 @@ class InvoiceController extends Controller
           </tr>";
         }
       }
+
+      if($exitDate != null){
+        $guests->deleted_at = date('Y-m-d');
+        $guests->save();
+      }
     }
 
     $content .= "
@@ -457,7 +474,7 @@ class InvoiceController extends Controller
     $newInvoice->totalBill = $sum;
     $newInvoice->startDate = $startDate;
     $newInvoice->endDate = $endDate;
-    $newInvoice->dueDate = $endDate;
+    $newInvoice->dueDate = $dueDate;
     $newInvoice->room_location = $locationID;
     $newInvoice->save();
 
@@ -465,7 +482,7 @@ class InvoiceController extends Controller
 
     $mpdf->WriteHTML($content);
 
-    $filename = date_format($endDate, "Y-m-d")." Invoice.pdf";
+    $filename = $invoiceCode." ".date_format($endDate, "Y-m-d")." Invoice.pdf";
     $mpdf->Output($filename, 'D');
   }
 

@@ -2,7 +2,8 @@
 @extends('layouts.app')
 @include('includes.navbar')
 @section('content')
-    <h1>List of Guests in {{$location->name}}</h1>
+    <h1>Guests Attendance in {{$location->name}}</h1>
+    <p>{{$date}}</p>
     {!! Form::open(['action' => 'AttendanceController@attend','method' => 'POST']) !!}
         <table class="table table-striped">
             <tr>

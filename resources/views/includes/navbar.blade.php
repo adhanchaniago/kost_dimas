@@ -42,7 +42,7 @@
                                 </a>
                             </li>
                             <li>
-                                <a href="/guests/create">
+                                <a href="/guests/get_room">
                                     Add Guest
                                 </a>
                             </li>

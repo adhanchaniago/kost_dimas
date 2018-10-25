@@ -2,7 +2,7 @@
 @extends('layouts.app')
 @include('includes.navbar')
 @section('content')
-    <h1>LB Form</h1>
+    <h1>Form Laporan Bulanan</h1>
     <small>Please pick the kost location and date</small>
     <hr>
     <div class="col-sm-2">

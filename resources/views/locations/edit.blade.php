@@ -3,6 +3,12 @@
 @include('includes.navbar')
 @section('content')
     <h1>Edit Location</h1>
+    <a href="/locations" class="btn btn-primary">Back to Locations</a>
+    {!!Form::open(['action'=>['LocationsController@destroy',$location->id],'method'=>'DELETE','class'=>'pull-right','onsubmit'=>"return confirm('Are you sure you want to delete ".$location->name."?');"])!!}
+        {{Form::hidden('_method','DELETE')}}
+        {{Form::submit('Delete Data',['class'=>'btn btn-danger'])}}
+    {!!Form::close()!!}
+    <hr>
     {!! Form::open(['action' => ['LocationsController@update',$location->id], 'method' => 'PUT']) !!}
     {{--  <div class="form-group">
       {{Form::label('room_number', 'Room Number')}}
@@ -20,30 +26,43 @@
       {{Form::label('capacity', 'Total Capacity')}}
       {{Form::number('total_capacity',$location->capacity,['class'=>'form-control'])}}
     </div>
-    <div class="form-group">
+     <div class="form-group">
         
         <table id="selectInput" class="table table-striped">
             <tr>
                 <th>Room Types</th>
+                <th>Quantity</th>
                 <th>Action</th>
+                <th>
+                    <button class="add_form_field">Add New Field &nbsp; <span style="font-size:16px; font-weight:bold;">+ </span></button> 
+                </th>
             </tr>
             @foreach ($room_details as $room_detail)
                 <tr>
                     <td>
-                        {{Form::text('room_type[]',$room_detail->room_type,['class'=>'form-control','placeholder'=>'Room_Type'])}}
+                        {{Form::text('room_type[]',$room_detail->room_type,['class'=>'form-control','placeholder'=>'Room Type'])}}
                     </td>
                     <td>
-                        
+                        {{Form::number('room_type_quantity[]',$room_detail->quantity,['class'=>'form-control','placeholder'=>'Capacity'])}}
                     </td>
+                    <td>
+                        {{Form::number('room_type_rate[]',$room_detail->daily_rate,['class'=>'form-control','placeholder'=>'Daily Rate'])}}
+                    </td>
+                    <td colspan="2">
+                        <center>
+                            <a href="#" class="delete btn btn-danger">Delete</a>
+                        </center>
+                    </td>
+                    {{Form::hidden('room_detail_id[]',$room_detail->id)}}
                 </tr>
             @endforeach
         </table>
     </div>
     
     {{Form::hidden('_method','PUT')}}
-    {{Form::submit('Submit',['class'=>'btn btn-primary form-control'])}}
+    {{Form::submit('Update',['class'=>'btn btn-primary form-control'])}}
   {!! Form::close() !!}
-  {{--  <button class="add_form_field">Add New Field &nbsp; <span style="font-size:16px; font-weight:bold;">+ </span></button>  --}}
+   
 @endsection
 
 @section('scripts')
@@ -64,7 +83,7 @@
             if(x < max_fields){
                 x++;
 
-                $(wrapper).append('<tr><td><input type="text" name="room_type[]" class="form-control"></td><td><a href="#" class="delete btn btn-danger">Delete</a></td></tr>'); 
+                $(wrapper).append('<tr><td><input type="text" name="room_type[]" class="form-control"></td><td><input type="number" name="room_type_quantity[]" class="form-control"></td><td><input type="number" min="1" class="form-control" name="room_type_rate[]"></td><td colspan="2"><center><a href="#" class="delete btn btn-danger">Delete</a></center></td></tr>'); 
             }
             else
             {

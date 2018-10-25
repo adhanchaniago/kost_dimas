@@ -12,7 +12,7 @@
                         <a href="/guests" class="btn btn-primary">List of Guests</a>
                     </div>
                     <div class="col-sm-6">
-                        <a href="/guests/create" class="btn btn-primary">Add Guest</a>
+                        <a href="/guests/get_room" class="btn btn-primary">Add Guest</a>
                     </div>
                 </div>
             </div>
@@ -21,9 +21,9 @@
 
                 <div class="panel-body">
                     <ul>
-                        <li><a href="/invoice" class="btn btn-primary">Create Invoice</a></li>
-                        <li><a href="/attendance/report" class="btn btn-primary">Create LB</a></li>
-                        <li><a href="/receipt" class="btn btn-primary">Create Receipt</a></li>
+                        <li style="margin-top:2%;"><a href="/invoice" class="btn btn-primary">Create Invoice</a></li>
+                        <li style="margin-top:2%;"><a href="/attendance/report" class="btn btn-primary">Create Laporan Bulanan</a></li>
+                        <li style="margin-top:2%;"><a href="/receipt" class="btn btn-primary">Create Receipt</a></li>
                     </ul>
                 </div>
             </div>

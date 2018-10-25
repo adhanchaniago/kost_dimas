@@ -14,9 +14,6 @@
                 {{Form::label('room_location', 'Room Location')}}
                 {{--  {{Form::select('room_location',[1=>'Maysa Kertamukti 1',2=>'Maysa Kertamukti 2', 3=>'Maysa Cirendeu', 4=>'Pesona Gunung Indah', 5=>'Maysa Kalibata'],'',['class'=>'form-control'])}}  --}}
                 <select name="room_location" class="form-control">
-                    <option value="0">
-                        All Location
-                    </option>
                     @foreach($locations as $location)
                         <option value="{{$location->id}}">
                             {{$location->name}}

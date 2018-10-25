@@ -29,11 +29,30 @@ class LocationsController extends Controller
           'capacity' => 'required'
         ]);
 
+        $type_array = array();
+        $type_array_quantity = array();
+        $type_array_rate = array();
+
+        $type_array = $request->input('room_type');
+        $type_array_quantity = $request->input('room_type_quantity');
+        $type_array_rate = $request->input('room_type_rate');
+
         $location = new Location;
         $location->name = $request->input('name');
         $location->capacity = $request->input('capacity');
         $location->address = $request->input('address');
         $location->save();
+
+        $locationID = Location::orderBy('created_at','desc')->first();
+
+        for($x=0;$x<sizeof($type_array);$x++){
+            $room_detail = new RoomDetail;
+            $room_detail->room_type = $type_array[$x];
+            $room_detail->quantity = $type_array_quantity[$x];
+            $room_detail->daily_rate = $type_array_rate[$x];
+            $room_detail->room_location = $locationID->id;
+            $room_detail->save();
+        }
 
         return redirect('/locations')->with('success','location added');
     }
@@ -84,8 +103,13 @@ class LocationsController extends Controller
         ]);
         
         $type_array = array();
-        $type_array = $request->input('room_type');
+        $type_array_quantity = array();
+        $type_array_rate = array();
 
+        $type_array = $request->input('room_type');
+        $type_array_quantity = $request->input('room_type_quantity');
+        $type_array_rate = $request->input('room_type_rate');
+        
         $location = Location::find($id);
         $location->name = $request->input('name');
         $location->capacity = $request->input('total_capacity');
@@ -94,20 +118,31 @@ class LocationsController extends Controller
 
         $room_details = RoomDetail::where('room_location',$id)->get();
         
-        $x = 0;
-        
+        $counter = 0;
         foreach($room_details as $room_detail){
-            $room_detail->room_type = $type_array[$x];
+            $room_detail->room_type = $type_array[$counter];
+            $room_detail->quantity = $type_array_quantity[$counter];
+            $room_detail->daily_rate = $type_array_rate[$counter];
             $room_detail->save();
-            $x++;
+            $counter++;
         }
+
+        for($counter;$counter<sizeof($type_array);$counter++){
+            $room_detail = new RoomDetail;
+            $room_detail->room_type = $type_array[$counter];
+            $room_detail->quantity = $type_array_quantity[$counter];
+            $room_detail->daily_rate = $type_array_rate[$counter];
+            $room_detail->room_location = $id;
+            $room_detail->save();
+        }
+        
 
         return redirect('/locations')->with('success','location updated');
     }
 
     public function destroy($id){
         $date = date('Y-m-d H:i:s');
-        $location = Guest::find($id);
+        $location = Location::find($id);
         $location->deleted_at = $date;
         $location->save();
 

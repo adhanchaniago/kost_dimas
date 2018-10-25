@@ -33,7 +33,7 @@ class AttendanceController extends Controller
             return view('attendance.form')->with('guests',$guests)->with('location',$location);
         }
         else{
-            return view('attendance.edit')->with('guests',$guests)->with('location',$location)->with('attendances',$attendances);
+            return view('attendance.edit')->with('guests',$guests)->with('location',$location)->with('attendances',$attendances)->with('date',$date);
         }
         
         
@@ -144,11 +144,18 @@ class AttendanceController extends Controller
 
             foreach($guests as $guest){
                 if($guest->room_location == $location->id){
+                    /*
+                        if exit date is less than starting date,
+                        tanyain dimas lagi soal lb
+                    */
+                    if($guest->exit_date != NULL && $guest->exit_date < $start_date){
+                        echo "wkwkkwwk";
+                    }
                     $content .=
                     "<tr>
                         <td>".$guest->room_number."</td>
                         <td>".$guest->name."</td>
-                        <td>dummy</td>
+                        <td>letter number</td>
                         <td>".$guest->nationality."</td>
                     </tr>";
                 }

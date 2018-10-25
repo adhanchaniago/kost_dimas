@@ -15,7 +15,7 @@ class GuestsController extends Controller
      }
     
     public function index(){
-        $guests = Guest::where('deleted_at',NULL)->orderBy('id','asc')->paginate(10);
+        $guests = Guest::where('deleted_at',NULL)->where('exit_date',NULL)->orderBy('id','asc')->paginate(10);
         $locations = Location::where('deleted_at',NULL)->get();
         return view('Guests.index')->with('guests',$guests)->with('locations',$locations);
     }
@@ -108,7 +108,7 @@ class GuestsController extends Controller
 
     public function edit($id){
         $guest = Guest::find($id);
-
+        $locations = Location::where('deleted_at',NULL)->get();
         if($guest!=NULL){
             $deldate = $guest->deleted_at;
             
@@ -116,7 +116,7 @@ class GuestsController extends Controller
                 return redirect('/guests')->with('error','The data has been deleted');
             }
             else{
-                return view('guests.edit')->with('guest',$guest);
+                return view('guests.edit')->with('guest',$guest)->with('locations',$locations);
             }
 
         }
@@ -131,7 +131,7 @@ class GuestsController extends Controller
           'name' => 'required',
           'entry_date' => 'required',
           'room_number' => 'required',
-          'room_location' => 'required'
+        //   'room_location' => 'required'
         ]);
 
         $guest = Guest::find($id);
@@ -140,7 +140,7 @@ class GuestsController extends Controller
         // $guest->id_path = $request->input('id_path');
         $guest->description = $request->input('description');
         $guest->room_number = $request->input('room_number');
-        $guest->room_location = $request->input('room_location');
+        // $guest->room_location = $request->input('room_location');
         $guest->save();
 
         return redirect('/guests')->with('success','Guest Successfully Updated');

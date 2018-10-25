@@ -3,6 +3,8 @@
 @include('includes.navbar')
 @section('content')
     <h1>List of Locations</h1>
+    <a href="/locations/create" class="btn btn-primary">Add New Location</a>
+    <hr>
     <table class="table table-striped">
         <tr>
             <th>Name</th>
