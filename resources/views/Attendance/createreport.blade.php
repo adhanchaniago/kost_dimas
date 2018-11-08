@@ -11,10 +11,6 @@
         
         {!! Form::open(['action' => 'AttendanceController@generateReport', 'method' => 'POST']) !!}
             <div class="form-group">
-                {{Form::label('room_location', 'Room Location')}}
-                {{Form::select('room_location',[1=>'Maysa Kertamukti 1',2=>'Maysa Kertamukti 2', 3=>'Maysa Cirendeu', 4=>'Pesona Gunung Indah', 5=>'Maysa Kalibata'],'',['class'=>'form-control'])}}
-            </div>
-            <div class="form-group">
                 {{Form::label('start_date', 'Start Period')}}
                 {{Form::date('start_date','',['class'=>'form-control'])}}
             </div>

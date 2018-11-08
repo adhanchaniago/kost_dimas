@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Guest;
 use App\Location;
 use App\Attendance;
+use Datetime;
 
 class AttendanceController extends Controller
 {
@@ -113,9 +114,9 @@ class AttendanceController extends Controller
         $room_location = $request->input('room_location');
         $start_date = $request->input('start_date');
         $end_date = $request->input('end_date');
-        $guests = Guest::where('deleted_at',NULL)->whereBetween('entry_date',[$start_date,$end_date])->get();
+        $guests = Guest::where('deleted_at',NULL)->get();
         $locations = Location::all();
-        $location = Location::where('id',$room_location)->first();
+        //$location = Location::where('id',$room_location)->first();
         $date = date("j F Y");
         $month = date("F");
         $mpdf = new \Mpdf\Mpdf();
@@ -148,7 +149,9 @@ class AttendanceController extends Controller
                         if exit date is less than starting date,
                         tanyain dimas lagi soal lb
                     */
-                    if($guest->exit_date != NULL && $guest->exit_date < $start_date){
+                    $exit_datetime = new Datetime($guest->exit_date);
+                    $start_datetime = new Datetime($start_date);
+                    if($guest->exit_date != NULL && $exit_datetime < $start_datetime){
                         echo "wkwkkwwk";
                     }
                     $content .=
