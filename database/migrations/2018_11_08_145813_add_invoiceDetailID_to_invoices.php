@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddDeletedAtToLocations extends Migration
+class AddInvoiceDetailIDToInvoices extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,11 @@ class AddDeletedAtToLocations extends Migration
      */
     public function up()
     {
-        Schema::table('invoice_details', function (Blueprint $table) {
-            $table->date('deleted_at')->nullable();
+        
+        Schema::table('invoices', function(Blueprint $table) {
+            $table->integer('invoiceDetailID')->unsigned();
         });
+        
     }
 
     /**
@@ -25,8 +27,10 @@ class AddDeletedAtToLocations extends Migration
      */
     public function down()
     {
-        Schema::table('invoice_details', function (Blueprint $table) {
-            $table->dropColumn('deleted_at');
+        
+        Schema::table('invoices', function(Blueprint $table) {
+            $table->dropColumn('invoiceDetailID');
         });
+        
     }
 }

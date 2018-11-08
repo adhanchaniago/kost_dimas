@@ -10,6 +10,11 @@ use App\RoomDetail;
 
 class InvoiceController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+    
     public function index(){
         $locations = Location::where('deleted_at',NULL)->get();
         $invoice_details = InvoiceDetail::all();
@@ -471,6 +476,7 @@ class InvoiceController extends Controller
 
     $newInvoice = new Invoice;
     $newInvoice->invoiceNumber = $invoiceCode;
+    $newInvoice->invoiceDetailID = $invoiceDetail->id;
     $newInvoice->totalBill = $sum;
     $newInvoice->startDate = $startDate;
     $newInvoice->endDate = $endDate;
@@ -478,16 +484,19 @@ class InvoiceController extends Controller
     $newInvoice->room_location = $locationID;
     $newInvoice->save();
 
-    $mpdf = new \Mpdf\Mpdf();
+    $mpdf = new \Mpdf\Mpdf([
+    'default_font' => 'times'
+    ]);
 
     $mpdf->WriteHTML($content);
 
-    $filename = $invoiceCode." ".date_format($endDate, "Y-m-d")." Invoice.pdf";
+    $filename = date_format($endDate, "Y-m-d")." Invoice.pdf";
     $mpdf->Output($filename, 'D');
   }
 
   public function generateReceipt(Request $request){
     $invoice = Invoice::where('id', $request->input('invoiceID'))->first();
+    $invoiceDetail = InvoiceDetail::where('id', $invoice->invoiceDetailID)->first();
 
     $content =
     '<div>
@@ -504,7 +513,7 @@ class InvoiceController extends Controller
     </div>
     <div>
       <columns column-count="0" vAlign="" column-gap="5" />
-      Receipt From: INTERNATIONAL ORGANIZATION FOR MIGRATION (IOM)<br>
+      Receipt From: '.$invoiceDetail->bill_to.'<br>
       Said Amount : '.$invoice->totalBill.'
     </div>
     <div>
@@ -520,9 +529,9 @@ class InvoiceController extends Controller
       <p>
         : '.$invoice->invoiceNumber.'<br>
         : '.$invoice->dueDate.'<br>
-        : VENDOR NUMBER<br>
-        : CO NUMBER<br>
-        : LEG APPROVAL CODE
+        : '.$invoiceDetail->vendor_no.'<br>
+        : '.$invoiceDetail->co_no.'<br>
+        : '.$invoiceDetail->leg_code.'
       </p>
     </div>
     <div>
@@ -539,7 +548,9 @@ class InvoiceController extends Controller
         <p>
     </div>';
 
-    $mpdf = new \Mpdf\Mpdf();
+    $mpdf = new \Mpdf\Mpdf([
+    'default_font' => 'times'
+    ]);
 
     $mpdf->WriteHTML($content);
 
