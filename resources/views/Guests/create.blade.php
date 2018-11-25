@@ -42,7 +42,7 @@
     </div>
     <div class="form-group">
       {{Form::label('id_path', 'ID File')}}
-      {{Form::File('id_path','',['class'=>'form-control'])}}
+      {{Form::File('id_path','',['class'=>'form-control','required'])}}
     </div>
     {{Form::hidden('room_location',$location->id)}}
     {{Form::hidden('_method','POST')}}

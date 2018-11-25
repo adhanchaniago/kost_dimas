@@ -124,7 +124,7 @@ class AttendanceController extends Controller
 
         //$content = "";
         foreach($locations as $location){
-            $content =
+            $header =
             "<div style='text-align:center;'>
             <center>
                 <h1>MAYSA ANJAYA</h1>
@@ -138,33 +138,48 @@ class AttendanceController extends Controller
             <div>
                 <table border='1'>
                     <tr>
-                        <th>Room No</th>
-                        <th>Migrants Name</th>
+                        <th>Number</th>
+                        <th>Room Number</th>
+                        <th width='310px'>Migrants Name</th>
                         <th>UNHCR Letter</th>
                         <th>Nationality</th>
                     </tr>";
-
+            $mpdf->WriteHTML($header);
+            $counter = 1;
+            $content = "";
             foreach($guests as $guest){
                 if($guest->room_location == $location->id){
-                    /*
-                        if exit date is less than starting date,
-                        tanyain dimas lagi soal lb
-                    */
                     $exit_datetime = new Datetime($guest->exit_date);
                     $start_datetime = new Datetime($start_date);
                     if($exit_datetime > $start_datetime || $exit_datetime == null){
                       $content .=
                       "<tr>
+                          <td>".$counter."</td>
                           <td>".$guest->room_number."</td>
                           <td>".$guest->name."</td>
-                          <td>letter number</td>
+                          <td>".$guest->description."</td>
                           <td>".$guest->nationality."</td>
                       </tr>";
                     }
+                    $counter++;
+                    if($counter % 31 == 0){
+                        $content .=
+                            "</table>
+                            <br><br><br><br><br><br><br><br><br><br><br><br>
+                            <table border='1'>
+                                <tr>
+                                    <th>Number</th>
+                                    <th>Room Number</th>
+                                    <th width='310px'>Migrants Name</th>
+                                    <th>UNHCR Letter</th>
+                                    <th>Nationality</th>
+                                </tr>";
+                    }
                 }
+                
             }
-
-            $content .=
+            $mpdf->writeHTML($content);
+            $footer =
             "</table>
             </div>
             <div>
@@ -177,7 +192,7 @@ class AttendanceController extends Controller
             </div>
             ";
 
-            $mpdf->WriteHTML($content);
+            $mpdf->WriteHTML($footer);
             $mpdf->AddPage();
         }
 

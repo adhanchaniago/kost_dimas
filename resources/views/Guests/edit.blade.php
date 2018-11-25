@@ -8,6 +8,7 @@
       {{Form::label('room_number', 'Room Number')}}
       {{Form::select('room_number',[1=>'Pendapatan Pribadi',2=>'Tambahan Modal', 3=>'Lain - Lain'],'',['class'=>'form-control'])}}
     </div>  --}}
+    <h3>Location = {{$location->name}}</h3>
     <div class="form-group">
       {{Form::label('name', 'Name')}}
       {{Form::text('name',$guest->name,['class'=>'form-control','placeholder'=>'Guest Name'])}}
@@ -24,10 +25,14 @@
       {{Form::label('description', 'Description')}}
       {{Form::textarea('description',$guest->description,['class'=>'form-control'])}}
     </div>
-    {{--  <div class="form-group">
-      {{Form::label('room_location', 'Room Location')}}
-      
-    </div>  --}}
+    <div class="form-group">
+      {{Form::label('room_type', 'Room Type')}}
+      <select class="form-control" name="room_type">
+          @foreach($room_details as $room_detail)
+            <option value="{{$room_detail->id}}" @if($guest->room_type == $room_detail->id)selected @endif>{{$room_detail->room_type}}</option>
+          @endforeach
+      </select>
+    </div>
     <div class="form-group">
       {{Form::label('room_number', 'Room Number')}}
       {{Form::number('room_number',$guest->room_number,['class'=>'form-control'])}}

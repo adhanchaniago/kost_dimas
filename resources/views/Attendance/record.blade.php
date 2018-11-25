@@ -9,6 +9,7 @@
                 <th>Location</th>
                 <th>Room Number</th>
                 <th>ID</th>
+                <th>Clock In Time</th>
                 <th>Entry Date</th>
                 <th>Stay Duration</th>
                 <th>Exit Date</th>
@@ -19,6 +20,7 @@
                 <td>{{$attendance->location->name}}</td>
                 <td>{{$attendance->guest->room_number}}</td>
                 <td><img src="../../../<?php echo $attendance->guest->id_path; ?>" style="height:200px;width:300px;"></td>
+                <td>{{$attendance->updated_at}}</td>
                 <td>{{$attendance->guest->entry_date}}</td>
                 <td>
                     <?php

@@ -15,7 +15,7 @@ class GuestsController extends Controller
      }
     
     public function index(){
-        $guests = Guest::where('deleted_at',NULL)->where('exit_date',NULL)->orderBy('id','asc')->paginate(10);
+        $guests = Guest::where('deleted_at',NULL)->where('exit_date',NULL)->orderBy('id','asc')->paginate(30);
         $locations = Location::where('deleted_at',NULL)->get();
         return view('Guests.index')->with('guests',$guests)->with('locations',$locations);
     }
@@ -109,6 +109,8 @@ class GuestsController extends Controller
     public function edit($id){
         $guest = Guest::find($id);
         $locations = Location::where('deleted_at',NULL)->get();
+        $location = Location::where('id',$guest->room_location)->first();
+        $room_details = RoomDetail::where('room_location',$location->id)->get();
         if($guest!=NULL){
             $deldate = $guest->deleted_at;
             
@@ -116,7 +118,7 @@ class GuestsController extends Controller
                 return redirect('/guests')->with('error','The data has been deleted');
             }
             else{
-                return view('guests.edit')->with('guest',$guest)->with('locations',$locations);
+                return view('guests.edit')->with('guest',$guest)->with('room_details',$room_details)->with('location',$location);
             }
 
         }
@@ -154,6 +156,12 @@ class GuestsController extends Controller
         $guest->save();
 
         return redirect('/guests')->with('success','Guest Deleted');
+    }
+
+    public function search(Request $request){
+        $guest_name = $request->input('guest_name');
+        $guests = Guest::where('name','like','%'.$guest_name.'%')->paginate(30);
+        return view('Guests.index')->with('guests',$guests);
     }
     
 

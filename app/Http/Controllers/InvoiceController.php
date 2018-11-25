@@ -490,7 +490,7 @@ class InvoiceController extends Controller
 
     $mpdf->WriteHTML($content);
 
-    $filename = date_format($endDate, "Y-m-d")." Invoice.pdf";
+    $filename = $location->name."_".date_format($endDate, "Y-m-d")." Invoice.pdf";
     $mpdf->Output($filename, 'D');
   }
 

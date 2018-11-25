@@ -3,7 +3,27 @@
 @include('includes.navbar')
 @section('content')
     <h1>List of Guests</h1>
-    <td><a href="guests/get_room" class="btn btn-primary">Add Guest</a></td>
+    <div class="row">
+        <div class="col-sm-4">
+            <a href="guests/get_room" class="btn btn-primary form-control">Add Guest</a>
+        </div>
+        <div class="col-sm-4"></div>
+        <div class="col-sm-4">
+            {!! Form::open(['action' => 'GuestsController@search', 'method' => 'POST']) !!}
+                <table style="margin-top:10px;">
+                    <tr>
+                        <td>
+                            {{Form::text('guest_name','',['class'=>'form-control','placeholder'=>'Search By Guest Name'])}}
+                        </td>
+                        <td>
+                            {{Form::submit('Submit',['class'=>'btn btn-primary form-control'])}}
+                        </td>
+                    </tr>    
+                </table>
+                {{Form::hidden('_method','POST')}}
+            {!! Form::close() !!}
+        </div>
+    </div>
     <hr>
     <table class="table table-striped">
         <tr>

@@ -37,6 +37,7 @@ Route::post('guests/{id}/edit','GuestsController@update');
 
 Route::delete('guests/{id}','GuestsController@destroy');
 
+Route::post('guests/search','GuestsController@search');
 
 Route::resource('locations','LocationsController');
 
