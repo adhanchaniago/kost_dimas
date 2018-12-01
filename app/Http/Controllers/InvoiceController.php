@@ -167,14 +167,15 @@ class InvoiceController extends Controller
     $occEnd = null;
     $prorate = array();
     $last = count($guests);
-
+    
     foreach($guests as $guests){
       $duration = 0;
 
       if($guests->room_number != $currentRoom){
           if($occupant != null){
             $occupancy = date_diff($occStart, $occEnd)->format("%a") + 1;
-            $totalPrice = $occupancy * $currentRoomType->monthly_rate;
+            //$totalPrice = $occupancy * $currentRoomType->monthly_rate;
+            $totalPrice = $currentRoomType->monthly_rate;
             $sum += $totalPrice;
 
             $content .= "<tr>
@@ -364,7 +365,8 @@ class InvoiceController extends Controller
       if(++$i == $last){
           if($occupant != null){
             $occupancy = date_diff($occStart, $occEnd)->format("%a") + 1;
-            $totalPrice = $occupancy * $currentRoomType->monthly_rate;
+            //$totalPrice = $occupancy * $currentRoomType->monthly_rate;
+            $totalPrice = $currentRoomType->monthly_rate;
             $sum += $totalPrice;
 
             $content .= "<tr>
@@ -382,6 +384,7 @@ class InvoiceController extends Controller
           $occEnd = null;
           $occupant = null;
       }
+      
     }
 
     $counter = 2;
@@ -514,7 +517,7 @@ class InvoiceController extends Controller
     <div>
       <columns column-count="0" vAlign="" column-gap="5" />
       Receipt From: '.$invoiceDetail->bill_to.'<br>
-      Said Amount : '.$invoice->totalBill.'
+      Said Amount : '.number_format($invoice->totalBill).'
     </div>
     <div>
       <columns column-count="2" />

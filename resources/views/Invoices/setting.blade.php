@@ -10,8 +10,8 @@
     </div>
     <div class="col-sm-12">
         <small>The numbers below will be used in the invoice, if there are any changes you want to make, please modify the form below</small>
+        <hr>
     </div>
-    <hr>
     <div class="col-sm-2"></div>
 
     <div class="col-sm-8">

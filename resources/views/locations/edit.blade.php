@@ -46,7 +46,10 @@
                         {{Form::number('room_type_quantity[]',$room_detail->quantity,['class'=>'form-control','placeholder'=>'Capacity'])}}
                     </td>
                     <td>
-                        {{Form::number('room_type_rate[]',$room_detail->daily_rate,['class'=>'form-control','placeholder'=>'Daily Rate'])}}
+                        {{Form::number('room_type_rate[]',$room_detail->daily_rate,['class'=>'form-control','placeholder'=>'Pro Rate'])}}
+                    </td>
+                    <td>
+                        {{Form::number('room_type_rate_month[]',$room_detail->monthly_rate,['class'=>'form-control','placeholder'=>'Monthly Rate'])}}
                     </td>
                     <td colspan="2">
                         <center>
@@ -83,7 +86,7 @@
             if(x < max_fields){
                 x++;
 
-                $(wrapper).append('<tr><td><input type="text" name="room_type[]" class="form-control"></td><td><input type="number" name="room_type_quantity[]" class="form-control"></td><td><input type="number" min="1" class="form-control" name="room_type_rate[]"></td><td colspan="2"><center><a href="#" class="delete btn btn-danger">Delete</a></center></td></tr>'); 
+                $(wrapper).append('<tr><td><input type="text" name="room_type[]" class="form-control"></td><td><input type="number" name="room_type_quantity[]" class="form-control"></td><td><input type="number" min="1" class="form-control" name="room_type_rate[]" placeholder="Daily Rate"></td><td><input type="number" min="1" class="form-control" name="room_type_rate_month[]" placeholder="Monthly Rate"></td><td colspan="2"><center><a href="#" class="delete btn btn-danger">Delete</a></center></td></tr>'); 
             }
             else
             {

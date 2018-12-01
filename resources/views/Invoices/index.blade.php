@@ -9,7 +9,7 @@
         <small>Select Invoice Period and Location</small>
     </div>
     <div class='col-sm-12'>
-        <small><a href="invoice/settings">Invoice Settings</a></small>
+        <small><a href="invoice/settings" class="btn btn-primary">Invoice Settings</a></small>
     </div>
     <hr>
     <div class="col-sm-2"></div>
