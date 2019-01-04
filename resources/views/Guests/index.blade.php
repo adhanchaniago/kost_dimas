@@ -5,7 +5,7 @@
     <h1>List of Guests</h1>
     <div class="row">
         <div class="col-sm-4">
-            <a href="guests/get_room" class="btn btn-primary form-control">Add Guest</a>
+            <a href="/guests/get_room" class="btn btn-primary form-control">Add Guest</a>
         </div>
         <div class="col-sm-4"></div>
         <div class="col-sm-4">
@@ -39,7 +39,7 @@
             <td>{{$guest->entry_date}}</td>
             <td>{{$guest->location->name}}</td>
             <td>{{$guest->room_number}}</td>
-            <td><a href="guests/{{$guest->id}}" class="btn btn-default">Details</a></td>
+            <td><a href="/guests/{{$guest->id}}" class="btn btn-default">Details</a></td>
         </tr>
         @endforeach
     </table>

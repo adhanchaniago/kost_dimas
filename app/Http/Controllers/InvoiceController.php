@@ -167,6 +167,7 @@ class InvoiceController extends Controller
     $occEnd = null;
     $prorate = array();
     $last = count($guests);
+    $rowCounter = 0;
     
     foreach($guests as $guests){
       $duration = 0;

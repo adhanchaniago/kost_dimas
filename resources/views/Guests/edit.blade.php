@@ -22,7 +22,7 @@
       {{Form::date('exit_date',$guest->exit_date,['class'=>'form-control'])}}
     </div>
     <div class="form-group">
-      {{Form::label('description', 'Description')}}
+      {{Form::label('description', 'UNHCR Letter')}}
       {{Form::textarea('description',$guest->description,['class'=>'form-control'])}}
     </div>
     <div class="form-group">
