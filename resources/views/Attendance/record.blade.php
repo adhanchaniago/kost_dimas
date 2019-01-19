@@ -10,9 +10,9 @@
                 <th>Room Number</th>
                 <th>ID</th>
                 <th>Clock In Time</th>
-                <th>Entry Date</th>
+                <th style="display:none;">Entry Date</th>
                 <th>Stay Duration</th>
-                <th>Exit Date</th>
+                <th style="display:none;">Exit Date</th>
             </tr>
             @foreach($attendances as $attendance)
             <tr>
@@ -21,11 +21,14 @@
                 <td>{{$attendance->guest->room_number}}</td>
                 <td><img src="../../../<?php echo $attendance->guest->id_path; ?>" style="height:200px;width:300px;"></td>
                 <td>{{$attendance->updated_at}}</td>
-                <td>{{$attendance->guest->entry_date}}</td>
+                <td style="display:none;">{{$attendance->guest->entry_date}}</td>
                 <td>
                     <?php
                         //logic 1
-                        if($attendance->guest->exit_date == NULL){
+                        if($attendance->guest->entry_date == NULL){
+                            echo "Entry Date is Not Set";
+                        }
+                        else if($attendance->guest->exit_date == NULL){
                             $date2 = date_create($atd_date);
                             $date1 = date_create($attendance->guest->entry_date); 
                             $days_left = $date2->diff($date1);
@@ -40,10 +43,9 @@
                             echo $int." days";
                         }
                         
-
                     ?>
                 </td>
-                <td>{{$attendance->guest->exit_date}}</td>
+                <td style="display:none;">{{$attendance->guest->exit_date}}</td>
             </tr>
             @endforeach
         </table>

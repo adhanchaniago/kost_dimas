@@ -15,7 +15,7 @@
     <div class="col-sm-2"></div>
 
     <div class="col-sm-8">
-        {!! Form::open(['action' => 'InvoiceController@generateInvoice', 'method' => 'POST']) !!}
+        {!! Form::open(['action' => 'InvoiceController@modifySettings', 'method' => 'POST']) !!}
             <div class="form-group">
                 {{Form::label('vendor_no', 'Vendor No.')}}
                 {{Form::text('vendor_no',$invoice_detail->vendor_no,['class'=>'form-control'])}}
@@ -32,7 +32,14 @@
                 {{Form::label('bill_to', 'Bill To')}}
                 {{Form::textarea('bill_to',$invoice_detail->bill_to,['class'=>'form-control'])}}
             </div>
-
+            <div class="form-group">
+                {{Form::label('acc_bank', 'Bank Name')}}
+                {{Form::text('acc_bank',$invoice_detail->acc_bank,['class'=>'form-control'])}}
+            </div>
+            <div class="form-group">
+                {{Form::label('acc_num', 'Account Number')}}
+                {{Form::text('acc_num',$invoice_detail->acc_num,['class'=>'form-control'])}}
+            </div>
             {{Form::hidden('_method','POST')}}
             {{Form::submit('Submit',['class'=>'btn btn-primary form-control'])}}
         {!! Form::close() !!}

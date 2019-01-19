@@ -32,10 +32,12 @@ class LocationsController extends Controller
         $type_array = array();
         $type_array_quantity = array();
         $type_array_rate = array();
+        $type_array_rate_month = array();
 
         $type_array = $request->input('room_type');
         $type_array_quantity = $request->input('room_type_quantity');
         $type_array_rate = $request->input('room_type_rate');
+        $type_array_rate_month = $request->input('room_type_rate_month');
 
         $location = new Location;
         $location->name = $request->input('name');
@@ -50,6 +52,7 @@ class LocationsController extends Controller
             $room_detail->room_type = $type_array[$x];
             $room_detail->quantity = $type_array_quantity[$x];
             $room_detail->daily_rate = $type_array_rate[$x];
+            $room_detail->monthly_rate = $type_array_rate_month[$x];
             $room_detail->room_location = $locationID->id;
             $room_detail->save();
         }
@@ -125,7 +128,7 @@ class LocationsController extends Controller
             if(array_key_exists($counter,$type_array)){
                 $room_detail->room_type = $type_array[$counter];
                 $room_detail->quantity = $type_array_quantity[$counter];
-                $room_detail->monthly_rate = $type_array_month[$counter];
+                $room_detail->monthly_rate = $type_array_rate_month[$counter];
                 $room_detail->daily_rate = $type_array_rate[$counter];
                 $room_detail->save();
             }

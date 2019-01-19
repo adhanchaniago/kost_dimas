@@ -36,7 +36,8 @@ class GuestsController extends Controller
           'name' => 'required',
           'entry_date' => 'required',
           'room_number' => 'required',
-          'room_location' => 'required'
+          'room_location' => 'required',
+          'id_path' => 'required',
         ]);
         //availability check
         // $room_location = $request->input('room_location');

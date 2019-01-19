@@ -31,10 +31,11 @@
         <table id="selectInput" class="table table-striped">
             <tr>
                 <th>Room Types</th>
-                <th>Quantity</th>
-                <th>Action</th>
+                <th>Room Type Quantity</th>
+                <th>Pro-Rate</th>
+                <th>Monthly Rate</th>
                 <th>
-                    <button class="add_form_field">Add New Field &nbsp; <span style="font-size:16px; font-weight:bold;">+ </span></button> 
+                    <button class="add_form_field" style="display:none;">Add New Field &nbsp; <span style="font-size:16px; font-weight:bold;">+ </span></button> 
                 </th>
             </tr>
             @foreach ($room_details as $room_detail)
@@ -53,7 +54,7 @@
                     </td>
                     <td colspan="2">
                         <center>
-                            <a href="#" class="delete btn btn-danger">Delete</a>
+                            <a href="#" class="delete btn btn-danger" style="display:none;">Delete</a>
                         </center>
                     </td>
                     {{Form::hidden('room_detail_id[]',$room_detail->id)}}

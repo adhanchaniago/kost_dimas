@@ -26,8 +26,8 @@
             <tr>
                 <th>Room Types</th>
                 <th>Quantity</th>
-                <th>Rate</th>
-                <th>Action</th>
+                <th>ProRate</th>
+                <th>Monthly Rate</th>
                 <th>
                     <button class="add_form_field">Add New Field &nbsp; <span style="font-size:16px; font-weight:bold;">+ </span></button> 
                 </th>
@@ -40,7 +40,10 @@
                 <input type="number" min="1" class="form-control" name="room_type_quantity[]">
               </td>
               <td>
-                <input type="number" min="1" class="form-control" name="room_type_rate[]">
+                <input type="number" min="1" class="form-control" name="room_type_rate[]" placeholder="ProRate">
+              </td>
+              <td>
+                <input type="number" min="1" name="room_type_rate_month[]" placeholder="Monthly Rate" class="form-control">
               </td>
               <td colspan="2">
                 <center>

@@ -149,9 +149,14 @@ class AttendanceController extends Controller
             $content = "";
             foreach($guests as $guest){
                 if($guest->room_location == $location->id){
+                    $guest_entry_datetime = new Datetime($guest->entry_date);
                     $exit_datetime = new Datetime($guest->exit_date);
                     $start_datetime = new Datetime($start_date);
-                    if($exit_datetime > $start_datetime || $exit_datetime == null){
+                    $end_datetime = new Datetime($end_date);
+                    if($guest_entry_datetime > $end_datetime || $exit_datetime < $start_datetime){
+                        continue;
+                    }
+                    else{
                       $content .=
                       "<tr>
                           <td>".$counter."</td>
@@ -223,8 +228,8 @@ class AttendanceController extends Controller
             // $count = Guest::where('room_location',$location->id)->whereBetween('entry_date',[$start_date,$end_date])->count();
             
             $guest_counter = 0;
-            foreach($guests as $guest){
-                if($guest->room_location == $location->id){
+            foreach($guests as $guests){
+                if($guests->room_location == $location->id){
                     $exit_datetime = new Datetime($guest->exit_date);
                     $start_datetime = new Datetime($start_date);
                     if($exit_datetime > $start_datetime || $exit_datetime == null){
