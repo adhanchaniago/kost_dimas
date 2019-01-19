@@ -119,6 +119,7 @@ class AttendanceController extends Controller
         //$location = Location::where('id',$room_location)->first();
         $date = date("j F Y");
         $month = date("F");
+        $year = date("Y");
         $count = 0;
         $mpdf = new \Mpdf\Mpdf();
 
@@ -218,7 +219,7 @@ class AttendanceController extends Controller
             <columnbreak />
             <columnbreak />
             <p>Tangerang, ".$date."
-            No. MA / LB.09 / 9 / 2018</p>
+            No. MA / LB.".$month." / ".$month." / ".$year."</p>
             <columns column-count='0' vAlign='' column-gap='5' />
             <p>Bersama ini dengan hormat Kami laporkan keberadaan Pengungsi warga negara asing di akomodasi Maysa Anjaya  yang  Kami kelola  sampai dengan tanggal ".$date." sebagaimana data data terlampir:</p>
             <ol>

@@ -7,6 +7,7 @@ use App\Location;
 use App\Invoice;
 use App\InvoiceDetail;
 use App\RoomDetail;
+use Datetime;
 
 class Prorate{
   public $occupants;
@@ -142,12 +143,12 @@ class InvoiceController extends Controller
       <div>
         <p>
           : '.$invoiceCode.'<br>
-          : '.date('Y-m-d').'<br>
+          : '.date('d/m/Y').'<br>
           : '.$invoiceDetail->vendor_no.'<br>
           : '.$invoiceDetail->co_no.'<br>
           : '.$invoiceDetail->leg_code.'<br>
-          : '.date_format($startDate,'d').' - '.date_format($endDate, 'd-m-Y').'<br>
-          : '.$dueDate.'
+          : '.date_format($startDate,'d').' - '.date_format($endDate, 'd/m/Y').'<br>
+          : '.date("d/m/Y",strtotime($dueDate)).'
         </p>
       </div>
       <columns column-count="2" />
@@ -432,7 +433,7 @@ class InvoiceController extends Controller
       <columnbreak />
       <div>
         <p style='padding-bottom: 3cm;text-align: center;'>
-          Tangerang, ".date_format($endDate, 'Y-m-d')."
+          Tangerang, ".date_format($endDate, 'd/m/Y')."
         </p>
         <p style='text-align: center;'>
           Djoni Muhammad
@@ -463,7 +464,9 @@ class InvoiceController extends Controller
   public function generateReceipt(Request $request){
     $invoice = Invoice::where('id', $request->input('invoiceID'))->first();
     $invoiceDetail = InvoiceDetail::where('id', $invoice->invoiceDetailID)->first();
-
+    $location = Location::where('id',$invoice->room_location)->first();
+    $endDate = new Datetime($invoice->endDate);
+    $invoiceCode = $location->code.'. / T.'.$this->numberToRoman(date_format($endDate, 'm')).'';
     $content =
     '<div>
       <p style="text-align: center;">
@@ -473,8 +476,8 @@ class InvoiceController extends Controller
         <columns column-count="3" vAlign="" column-gap="5" />
         <columnbreak />
         <columnbreak />
-        No. Receipt: RECEIPT NUMBER HERE<br>
-        '.$invoice->dueDate.'
+        No. Receipt: '.$invoiceCode.'<br>
+        '.date("d/m/Y",strtotime($invoice->dueDate)).'
       </p>
     </div>
     <div>
@@ -494,7 +497,7 @@ class InvoiceController extends Controller
       <columnbreak />
       <p>
         : '.$invoice->invoiceNumber.'<br>
-        : '.$invoice->dueDate.'<br>
+        : '.date("d/m/Y",strtotime($invoice->dueDate)).'<br>
         : '.$invoiceDetail->vendor_no.'<br>
         : '.$invoiceDetail->co_no.'<br>
         : '.$invoiceDetail->leg_code.'
@@ -503,11 +506,11 @@ class InvoiceController extends Controller
     <div>
       <columns column-count="2" />
         <p>
-          Facilities rent room rental periode '.$invoice->startDate.' to '.$invoice->endDate.'
+          Facilities rent room rental periode '.date("d/m/Y",strtotime($invoice->startDate)).' to '.date("d/m/Y",strtotime($invoice->endDate)).'
         </p>
       <columnbreak />
         <p style="padding-bottom: 3cm;text-align: center;">
-          Tangerang, '.$invoice->dueDate.'
+          Tangerang, '.date("d/m/Y",strtotime($invoice->dueDate)).'
         </p>
         <p style="text-align: center;">
           Djoni Muhammad
