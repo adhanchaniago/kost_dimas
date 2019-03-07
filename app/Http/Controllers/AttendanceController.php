@@ -16,7 +16,8 @@ class AttendanceController extends Controller
      }
 
     public function index(){
-        return view('attendance.index');
+        $locations = Location::where('deleted_at',NULL)->get();
+        return view('attendance.index')->with('locations',$locations);
     }
 
     public function atd_form(Request $request){

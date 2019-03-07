@@ -17,7 +17,15 @@
         {!! Form::open(['action' => 'AttendanceController@atd_form', 'method' => 'POST']) !!}
             <div class="form-group">
                 {{Form::label('room_location', 'Room Location')}}
-                {{Form::select('room_location',[1=>'Maysa Kertamukti 1',2=>'Maysa Kertamukti 2', 3=>'Maysa Cirendeu', 4=>'Pesona Gunung Indah', 5=>'Maysa Kalibata'],'',['class'=>'form-control'])}}
+                @if($locations -> isEmpty())
+                    <a href="/locations/create">There are no locations listed, Click here to Add Locations</a>
+                @else
+                    <select class="form-control" name="room_location">
+                        @foreach($locations as $location)
+                        <option value="{{$location->id}}">{{$location->name}}</option>
+                        @endforeach
+                    </select>
+                @endif
             </div>
             {{Form::hidden('_method','POST')}}
             {{Form::submit('Submit',['class'=>'btn btn-primary form-control'])}}
