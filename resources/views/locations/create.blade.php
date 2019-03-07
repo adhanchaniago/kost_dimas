@@ -5,10 +5,6 @@
     <a href="/locations" class="btn btn-primary">Back to List of Locations</a>
     <h1>Add Location</h1>
     {!! Form::open(['action' => 'LocationsController@store', 'method' => 'POST', 'files'=>'true']) !!}
-    {{--  <div class="form-group">
-      {{Form::label('room_number', 'Room Number')}}
-      {{Form::select('room_number',[1=>'Pendapatan Pribadi',2=>'Tambahan Modal', 3=>'Lain - Lain'],'',['class'=>'form-control'])}}
-    </div>  --}}
     <div class="form-group">
       {{Form::label('name', 'Name')}}
       {{Form::text('name','',['class'=>'form-control','placeholder'=>'Location Name'])}}
@@ -76,7 +72,7 @@
             if(x < max_fields){
                 x++;
 
-                $(wrapper).append('<tr><td><input type="text" name="room_type[]" class="form-control"></td><td><input type="number" name="room_type_quantity[]" class="form-control"></td><td><input type="number" min="1" class="form-control" name="room_type_rate[]"></td><td colspan="2"><center><a href="#" class="delete btn btn-danger">Delete</a></center></td></tr>'); 
+                $(wrapper).append('<tr><td><input type="text" name="room_type[]" class="form-control"></td><td><input type="number" name="room_type_quantity[]" class="form-control"></td><td><input type="number" min="1" class="form-control" name="room_type_rate[]" placeholder="ProRate"></td><td><input type="number" min="1" name="room_type_rate_month[]" placeholder="Monthly Rate" class="form-control"></td><td colspan="2"><center><a href="#" class="delete btn btn-danger">Delete</a></center></td></tr>'); 
             }
             else
             {

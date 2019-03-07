@@ -33,15 +33,21 @@
             <th>Room</th>
             <th>Details</th>
         </tr>
-        @foreach($guests as $guest)
-        <tr>
-            <td>{{$guest->name}}</td>
-            <td>{{$guest->entry_date}}</td>
-            <td>{{$guest->location->name}}</td>
-            <td>{{$guest->room_number}}</td>
-            <td><a href="/guests/{{$guest->id}}" class="btn btn-default">Details</a></td>
-        </tr>
-        @endforeach
+        @if($guests -> isEmpty())
+            <tr>
+                <td colspan="5">There are no guests</td>
+            </tr>
+        @else
+            @foreach($guests as $guest)
+            <tr>
+                <td>{{$guest->name}}</td>
+                <td>{{$guest->entry_date}}</td>
+                <td>{{$guest->location->name}}</td>
+                <td>{{$guest->room_number}}</td>
+                <td><a href="/guests/{{$guest->id}}" class="btn btn-default">Details</a></td>
+            </tr>
+            @endforeach
+        @endif
     </table>
     <center>
       {{$guests->links()}};

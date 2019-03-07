@@ -4,16 +4,20 @@
 @section('content')
     <a href="/locations" class="btn btn-primary">Back to List of Locations</a>
     <h1>{{$location->name}} Guests</h1>
-        <table style="margin-bottom:20px;">
-            <tr>
-                <td>
-                    <input type="text" name="searchGuest" class="form-control">
-                </td>
-                <td>
-                    <button type="submit" class="btn btn-primary">Search</button>
-                </td>
-            </tr>
-        </table>
+        {!! Form::open(['action' => 'LocationsController@search', 'method' => 'POST']) !!}
+            <table style="margin-top:10px;">
+                <tr>
+                    <td>
+                        {{Form::text('guest_name','',['class'=>'form-control','placeholder'=>'Search By Guest Name'])}}
+                    </td>
+                    <td>
+                        {{Form::submit('Submit',['class'=>'btn btn-primary form-control'])}}
+                    </td>
+                </tr>    
+            </table>
+            <input type="hidden" name="location_id" value={{$location->id}}>
+            {{Form::hidden('_method','POST')}}
+        {!! Form::close() !!}
         <table class="table table-striped" id="guest-table">
             <tr>
                 <th>Number</th>
@@ -26,18 +30,34 @@
             <?php 
                 $counter = ($guests->currentpage()-1)* $guests->perpage() + 1;
             ?>
-            @foreach($guests as $guest)
-                <tr>
-                    <td>{{$counter}}</td>
-                    <td>{{$guest->name}}</td>
-                    <td><img src="../../../<?php echo $guest->id_path; ?>" style="height:200px;width:300px;"></td>
-                    <td>{{$guest->entry_date}}</td>
-                    <td>{{$guest->room_number}}</td>
-                </tr>
-                <?php 
-                    $counter++;
-                ?>
-            @endforeach
+            @if($guests->isEmpty())
+                @if($error_message == null)
+                    <tr>
+                        <td colspan="5">
+                            <a href="/guests/get_room">There are no guests yet, click here to add guests</a>
+                        </td>
+                    </tr>
+                @else
+                    <tr>
+                        <td colspan="5">
+                            {{$error_message}}
+                        </td>
+                    </tr>
+                @endif
+            @else
+                @foreach($guests as $guest)
+                    <tr>
+                        <td>{{$counter}}</td>
+                        <td>{{$guest->name}}</td>
+                        <td><img src="../../../<?php echo $guest->id_path; ?>" style="height:200px;width:300px;"></td>
+                        <td>{{$guest->entry_date}}</td>
+                        <td>{{$guest->room_number}}</td>
+                    </tr>
+                    <?php 
+                        $counter++;
+                    ?>
+                @endforeach
+            @endif
         </table>
         <center>
         {{$guests->links()}};

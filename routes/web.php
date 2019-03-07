@@ -40,6 +40,7 @@ Route::delete('guests/{id}','GuestsController@destroy');
 Route::post('guests/search','GuestsController@search');
 
 Route::resource('locations','LocationsController');
+Route::post('locations/search','LocationsController@search');
 
 Route::get('/attendance','AttendanceController@index');
 

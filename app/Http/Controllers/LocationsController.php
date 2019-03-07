@@ -161,5 +161,14 @@ class LocationsController extends Controller
         return redirect('/locations')->with('success','Location Deleted');
     }
 
+    public function search(Request $request){
+        $location_id = $request->input('location_id');
+        $location = Location::find($location_id);
+        $guest_name = $request->input('guest_name');
+        $guests = Guest::where('name','like','%'.$guest_name.'%')->where('room_location',$location_id)->paginate(30);
+        $error_message = "Guest Not Found";
+        return view('Locations.show')->with('guests',$guests)->with('location',$location)->with('error_message',$error_message);
+    }
+
     
 }
