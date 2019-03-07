@@ -12,14 +12,17 @@
         {!! Form::open(['action' => 'AttendanceController@showRecord', 'method' => 'POST']) !!}
             <div class="form-group">
                 {{Form::label('room_location', 'Room Location')}}
-                {{--  {{Form::select('room_location',[1=>'Maysa Kertamukti 1',2=>'Maysa Kertamukti 2', 3=>'Maysa Cirendeu', 4=>'Pesona Gunung Indah', 5=>'Maysa Kalibata'],'',['class'=>'form-control'])}}  --}}
-                <select name="room_location" class="form-control">
-                    @foreach($locations as $location)
-                        <option value="{{$location->id}}">
-                            {{$location->name}}
-                        </option>
-                    @endforeach
-                </select>
+                @if($locations -> isEmpty())
+                    <a href="/locations/create"></a>
+                @else
+                    <select name="room_location" class="form-control">
+                        @foreach($locations as $location)
+                            <option value="{{$location->id}}">
+                                {{$location->name}}
+                            </option>
+                        @endforeach
+                    </select>
+                @endif
             </div>
             <div class="form-group">
                 {{Form::label('atd_date', 'Attendance Date')}}

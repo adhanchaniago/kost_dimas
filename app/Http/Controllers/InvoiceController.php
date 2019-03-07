@@ -37,7 +37,12 @@ class InvoiceController extends Controller
     public function index(){
         $locations = Location::where('deleted_at',NULL)->get();
         $invoice_details = InvoiceDetail::all();
-        return view('Invoices.index')->with('locations',$locations)->with('invoice_details',$invoice_details);
+        $guests = Guest::where('deleted_at',NULL)->get();
+        if($guests->isEmpty()){
+          return redirect('guests');
+        } else {
+          return view('Invoices.index')->with('locations',$locations)->with('invoice_details',$invoice_details);
+        }
     }
 
     public function enterSettings(){

@@ -35,9 +35,13 @@
     <div class="form-group">
       {{Form::label('room_type', 'Room Type')}}
       <select class="form-control" name="room_type">
-          @foreach($room_details as $room_detail)
-            <option value="{{$room_detail->id}}">{{$room_detail->room_type}}</option>
-          @endforeach
+          @if($room_details -> isEmpty())
+            <option value=0>There are no room details</option>
+          @else
+            @foreach($room_details as $room_detail)
+              <option value="{{$room_detail->id}}">{{$room_detail->room_type}}</option>
+            @endforeach
+          @endif
       </select>
     </div>
     <div class="form-group">
