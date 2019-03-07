@@ -425,8 +425,8 @@ class InvoiceController extends Controller
       <div>
         <p>
           Please remit payment in full amount to our bank:<br>
-          ".$invoiceDetail->acc_bank.", account number: ".$invoiceDetail->acc_num."<br>
-          account Holder: Djoni Muhammad SH.MM<br>
+          ".$invoiceDetail->acc_bank.", Account Number: ".$invoiceDetail->acc_num."<br>
+          Account Holder: Djoni Muhammad SH.MM<br>
           Bank Address: KCP. Cirendeu
         </p>
       </div>

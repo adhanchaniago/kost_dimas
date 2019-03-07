@@ -240,7 +240,7 @@ class AttendanceController extends Controller
             }
             if($guest_counter == 0){
                 $description .=
-                "<li>Tidak ada orang di ".$location->name." ".$location->address."</li>
+                "<li>Tidak ada penghuni di ".$location->name." ".$location->address."</li>
                 ";
             }
             else{
