@@ -47,7 +47,6 @@ class InvoiceController extends Controller
 
     public function enterSettings(){
         $invoice_detail = InvoiceDetail::orderBy('created_at','desc')->first();
-
         return view('Invoices.setting')->with('invoice_detail',$invoice_detail);
     }
 
