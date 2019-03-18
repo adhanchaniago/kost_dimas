@@ -15,7 +15,7 @@
     <div class="col-sm-2"></div>
 
     <div class="col-sm-8">
-        @if($invoice_detail == NULL || $invoice_detail->isEmpty())
+        @if($invoice_detail == NULL || !$invoice_detail)
             {!! Form::open(['action' => 'InvoiceController@modifySettings', 'method' => 'POST']) !!}
                 <div class="form-group">
                     {{Form::label('vendor_no', 'Vendor No.')}}

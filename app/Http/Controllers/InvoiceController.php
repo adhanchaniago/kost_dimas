@@ -51,6 +51,14 @@ class InvoiceController extends Controller
     }
 
     public function modifySettings(Request $request){
+        $this->validate($request,[
+          'vendor_no' => 'required',
+          'co_no' => 'required',
+          'leg_code' => 'required',
+          'bill_to' => 'required',
+          'acc_bank' => 'required',
+          'acc_num' => 'required',
+        ]);
         $invoice_detail = new InvoiceDetail;
         $invoice_detail->vendor_no = $request->input('vendor_no');
         $invoice_detail->co_no = $request->input('co_no');
