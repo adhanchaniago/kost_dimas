@@ -106,31 +106,6 @@
                                 </a>
                             </li>
                             <li>
-                                <a href="/locations/1">
-                                    Maysa Kertamukti 1
-                                </a>
-                            </li>
-                            <li>
-                                <a href="/locations/2">
-                                    Maysa Kertamukti 2
-                                </a>
-                            </li>
-                            <li>
-                                <a href="/locations/3">
-                                    Maysa Cirendeu
-                                </a>
-                            </li>
-                            <li>
-                                <a href="/locations/4">
-                                    Pesona Gunung Indah
-                                </a>
-                            </li>
-                            <li>
-                                <a href="/locations/5">
-                                    Maysa Kalibata
-                                </a>
-                            </li>
-                            <li>
                                 <a href="{{ route('logout') }}"
                                     onclick="event.preventDefault();
                                              document.getElementById('logout-form').submit();">
