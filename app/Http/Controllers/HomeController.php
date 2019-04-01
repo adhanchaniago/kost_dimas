@@ -27,4 +27,9 @@ class HomeController extends Controller
         $locations = Location::where('deleted_at',NULL)->get();
         return view('home')->with('locations',$locations);
     }
+
+    public function notFound()
+    {
+        return view('404');
+    }
 }

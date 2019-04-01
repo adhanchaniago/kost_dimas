@@ -68,3 +68,5 @@ Route::get('/attendance/report','AttendanceController@createReport');
 
 Route::post('/attendance/report','AttendanceController@generateReport');
 
+Route::get('/404', 'HomeController@notFound')->name('notFound');
+
