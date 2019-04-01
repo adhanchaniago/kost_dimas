@@ -101,10 +101,13 @@ class InvoiceController extends Controller
     }
 
     $locationID = $request -> input('locationID');
+    $kertamukti = Location::where('id',$locationID)->where('name','like','%'.'Kertamukti'.'%')->first();
+    $kertamukti_ids = Location::where('name','like','%'.'Kertamukti'.'%')->pluck('id')->toArray();
+    
     $sum = 0;
     $guests = Guest::where('room_location', $locationID)->where('deleted_at',NULL)->whereNotNull('entry_date')->whereNotNull('room_number')->orderBy('room_number')->get();
-    if($locationID == 1){
-      $guests = Guest::where('room_location', '1')->where('deleted_at', NULL)->orWhere('room_location', '2')->where('deleted_at', NULL)->where('deleted_at',NULL)->whereNotNull('entry_date')->whereNotNull('room_number')->orderBy('room_location')->orderBy('room_number')->get();
+    if($kertamukti){
+      $guests = Guest::where('room_location', $kertamukti_ids[0])->where('deleted_at', NULL)->orWhere('room_location', $kertamukti_ids[1])->where('deleted_at', NULL)->where('deleted_at',NULL)->whereNotNull('entry_date')->whereNotNull('room_number')->orderBy('room_location')->orderBy('room_type')->get();
     }
     $location = Location::where('id', $locationID)->first();
 
