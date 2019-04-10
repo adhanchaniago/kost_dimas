@@ -204,9 +204,19 @@ class InvoiceController extends Controller
     $prorateArray = array();
     $last = count($guests);
 
-    foreach($guests as $guests){
+    foreach($guests as $key => $guests){
       $duration = 0;
-
+      if($key == 0){
+        $content .= '
+              <tr>
+                  <th></th>
+                  <th></th>
+                  <th></th>
+                  <th>'.$currentRoomType->room_type.'</th>
+                  <th></th>
+                  <th></th>
+              </tr>';
+      }
       if($guests->room_number != $currentRoom){
           if($occupant != null){
             $occupancy = date_diff($occStart, $occEnd)->format("%a") + 1;
@@ -230,7 +240,7 @@ class InvoiceController extends Controller
               array_push($prorateArray, $newProrate);
             }
           }
-
+          
           if($guests->room_type != $currentRoomType->id){
             if($guests->room_location != $currentRoomType->room_location){
               $counter = 2;
@@ -274,7 +284,7 @@ class InvoiceController extends Controller
                     <th>1.</th>
                     <th>'.$location->name.'</th>
                     <th>'.$location->capacity.'</th>
-                    <th>'.$currentRoomType->room_type.'</th>
+                    <th></th>
                     <th></th>
                     <th></th>
                 </tr>';
@@ -298,7 +308,7 @@ class InvoiceController extends Controller
           $occEnd = null;
           $occupant = null;
       }
-
+      
       if($guests->room_number == $currentRoom){
           $guestEntry = date_create($guests->entry_date);
 
