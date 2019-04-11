@@ -144,6 +144,7 @@ class GuestsController extends Controller
         $guest->description = $request->input('description');
         $guest->room_number = $request->input('room_number');
         $guest->exit_date = $request->input('exit_date');
+        $guest->room_type = $request->input('room_type');
         // $guest->room_location = $request->input('room_location');
         $guest->save();
 
