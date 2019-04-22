@@ -13,7 +13,7 @@ class Guest extends Model
       return $this->belongsTo('App\Location','room_location');
     }
 
-    public function room_type()
+    public function roomType()
     {
       return $this->belongsTo('App\RoomDetail','room_type');
     }
