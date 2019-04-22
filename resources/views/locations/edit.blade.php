@@ -19,6 +19,10 @@
       {{Form::text('name',$location->name,['class'=>'form-control','placeholder'=>'Guest Name'])}}
     </div>
     <div class="form-group">
+      {{Form::label('name', 'Name')}}
+      {{Form::text('code',$location->code,['class'=>'form-control','placeholder'=>'Location Code'])}}
+    </div>
+    <div class="form-group">
       {{Form::label('address', 'Address')}}
       {{Form::textarea('address',$location->address,['class'=>'form-control'])}}
     </div>

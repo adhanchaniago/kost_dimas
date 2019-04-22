@@ -10,6 +10,10 @@
       {{Form::text('name','',['class'=>'form-control','placeholder'=>'Location Name'])}}
     </div>
     <div class="form-group">
+      {{Form::label('name', 'Name')}}
+      {{Form::text('code','',['class'=>'form-control','placeholder'=>'Location Code'])}}
+    </div>
+    <div class="form-group">
       {{Form::label('capacity', 'Capacity')}}
       {{Form::number('capacity','',['class'=>'form-control'])}}
     </div>

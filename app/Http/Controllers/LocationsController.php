@@ -26,7 +26,8 @@ class LocationsController extends Controller
     public function store(Request $request){
         $this->validate($request,[
           'name' => 'required',
-          'capacity' => 'required'
+          'capacity' => 'required',
+          'code' => 'required'
         ]);
 
         $type_array = array();
@@ -43,6 +44,7 @@ class LocationsController extends Controller
         $location->name = $request->input('name');
         $location->capacity = $request->input('capacity');
         $location->address = $request->input('address');
+        $location->code = $request->input('code');
         $location->save();
 
         $locationID = Location::orderBy('created_at','desc')->first();
@@ -119,6 +121,7 @@ class LocationsController extends Controller
         $location->name = $request->input('name');
         $location->capacity = $request->input('total_capacity');
         $location->address = $request->input('address');
+        $location->code = $request->input('code');
         $location->save();
 
         $room_details = RoomDetail::where('room_location',$id)->get();

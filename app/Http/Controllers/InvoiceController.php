@@ -125,7 +125,8 @@ class InvoiceController extends Controller
       $dueDate = date_format($endDate,'Y-m-d');
     }
 
-    $invoiceCode = $location->code.'. / T.'.$this->numberToRoman(date_format($endDate, 'm')).' / '.date_format($endDate, 'm / Y');
+    $location_code = $location->code == NULL ? $location->name : $location->code;
+    $invoiceCode = $location_code.'. / T.'.$this->numberToRoman(date_format($endDate, 'm')).' / '.date_format($endDate, 'm / Y');
     $currentRoomType = RoomDetail::where('room_location', $locationID)->first();
     $i = 0;
 
@@ -544,7 +545,8 @@ class InvoiceController extends Controller
       $dueDate = date_format($endDate,'Y-m-d');
     }
 
-    $invoiceCode = $location->code.'. / T.'.$this->numberToRoman(date_format($endDate, 'm')).' / '.date_format($endDate, 'm / Y');
+    $location_code = $location->code == NULL ? $location->name : $location->code;
+    $invoiceCode = $location_code.'. / T.'.$this->numberToRoman(date_format($endDate, 'm')).' / '.date_format($endDate, 'm / Y');
     $currentRoomType = RoomDetail::where('room_location', $locationID)->first();
     $i = 0;
 
