@@ -101,8 +101,8 @@ class InvoiceController extends Controller
     }
 
     $locationID = $request -> input('locationID');
-    $kertamukti = Location::where('id',$locationID)->where('name','like','%'.'Kertamukti'.'%')->first();
-    $kertamukti_ids = Location::where('name','like','%'.'Kertamukti'.'%')->pluck('id')->toArray();
+    $kertamukti = Location::where('id',$locationID)->where('name','like','%'.'KM'.'%')->first();
+    $kertamukti_ids = Location::where('name','like','%'.'KM'.'%')->pluck('id')->toArray();
     
     $sum = 0;
     $guests = Guest::where('room_location', $locationID)->where('deleted_at',NULL)->whereNotNull('entry_date')->whereNotNull('room_number')->orderBy('room_number')->get(); 
