@@ -33,10 +33,10 @@ class InvoiceController extends Controller
     {
         $this->middleware('auth');
     }
-
+    
     public function index(){
         $locations = Location::where('deleted_at',NULL)->get();
-        $invoice_details = InvoiceDetail::all();
+        $invoice_details = InvoiceDetail::orderBy('created_at','desc')->where('deleted_at',NULL)->get();
         $guests = Guest::where('deleted_at',NULL)->get();
         if($guests->isEmpty()){
           return redirect('guests');
@@ -132,6 +132,12 @@ class InvoiceController extends Controller
     $billMonth = date_format($endDate, 'm');
     $billYear = date_format($endDate, 'Y');
     $daysInMonth = cal_days_in_month(CAL_GREGORIAN, $billMonth, $billYear);
+
+    $columnCounter = 0;
+
+    $mpdf = new \Mpdf\Mpdf([
+    'default_font' => 'times'
+    ]);
 
     $content = '
     <columns column-count="3" vAlign="" column-gap="5" />
@@ -435,7 +441,7 @@ class InvoiceController extends Controller
           </tr>";
         }
     }
-
+    
     $content .= "
     <tr>
       <td></td>
@@ -466,19 +472,33 @@ class InvoiceController extends Controller
       </div>
     </div>";
 
-    $newInvoice = new Invoice;
-    $newInvoice->invoiceNumber = $invoiceCode;
-    $newInvoice->invoiceDetailID = $invoiceDetail->id;
-    $newInvoice->totalBill = $sum;
-    $newInvoice->startDate = $startDate;
-    $newInvoice->endDate = $endDate;
-    $newInvoice->dueDate = $dueDate;
-    $newInvoice->room_location = $locationID;
-    $newInvoice->save();
+    $invoiceExist = Invoice::where('invoiceNumber',$invoiceCode)->where('invoiceDetailID',$invoiceDetail->id)->where('totalBill',$sum)->where('startDate',$startDate)->where('endDate',$endDate)->where('room_location',$locationID)->first();
+    $exist_id = isset($invoiceExist->id) ? true : false;
+    
+    if(!$exist_id){
+      $newInvoice = new Invoice;
+      $newInvoice->invoiceNumber = $invoiceCode;
+      $newInvoice->invoiceDetailID = $invoiceDetail->id;
+      $newInvoice->totalBill = $sum;
+      $newInvoice->startDate = $startDate;
+      $newInvoice->endDate = $endDate;
+      $newInvoice->dueDate = $dueDate;
+      $newInvoice->room_location = $locationID;
+      $newInvoice->save();
+    } else {
+      $invoiceExist->invoiceNumber = $invoiceCode;
+      $invoiceExist->invoiceDetailID = $invoiceDetail->id;
+      $invoiceExist->totalBill = $sum;
+      $invoiceExist->startDate = $startDate;
+      $invoiceExist->endDate = $endDate;
+      $invoiceExist->dueDate = $dueDate;
+      $invoiceExist->room_location = $locationID;
+      $invoiceExist->save();
+    }
 
-    $mpdf = new \Mpdf\Mpdf([
-    'default_font' => 'times'
-    ]);
+    // $mpdf = new \Mpdf\Mpdf([
+    // 'default_font' => 'times'
+    // ]);
 
     $mpdf->WriteHTML($content);
 
