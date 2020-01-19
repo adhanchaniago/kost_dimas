@@ -507,6 +507,7 @@ class InvoiceController extends Controller
     $mpdf->Output($filename, 'D');
   }
   //new invoice function
+  
   public function gen_Invoice(Request $request){
     $startDate = date_create($request -> input('startDate'));
     if($request -> input('endDate') != null){
@@ -553,6 +554,10 @@ class InvoiceController extends Controller
     $billMonth = date_format($endDate, 'm');
     $billYear = date_format($endDate, 'Y');
     $daysInMonth = cal_days_in_month(CAL_GREGORIAN, $billMonth, $billYear);
+
+    $mpdf = new \Mpdf\Mpdf([
+    'default_font' => 'times'
+    ]);
 
     $content = '
     <columns column-count="3" vAlign="" column-gap="5" />
@@ -626,38 +631,29 @@ class InvoiceController extends Controller
     $last = count($guests);
     $same_rooms = [];
     $prorate_same_rooms = [];
+    $column_count = 0;
 
     foreach($guests as $key => $guest){
       $test = $guest->entry_date;
       $occ_start = new DateTime($guest->entry_date);
       $occ_end = $endDate;
       $occupancy = date_diff($occ_start,$occ_end)->format("%a") + 1;
-      $currentRoom = $guest->room_number;
+      $currentRoom = $guest->room_number;//loop by guest but check the rooms
 
       //if stayed more than 30 days, insert guest in same room numbers
       if($occupancy >= 30){
-        // $totalPrice = $guest->roomType->monthly_rate;
-        // $sum += $totalPrice;
         
-        if(sizeof($same_rooms) == 0){
+        if(sizeof($same_rooms) == 0){//initial check for guest in same room
           array_push($same_rooms,$guest);
         }
-
+        
+        //if next guest has the same room with the current room being checked
         if(isset($guests[$key+1]) && $guests[$key+1]->room_number == $currentRoom){
-          //$same_rooms .= "/".$guests[$key+1]->name;
-          array_push($same_rooms, $guests[$key+1]);
-        } else {
-          array_push($fulls, $same_rooms);
-          $same_rooms = [];
+          array_push($same_rooms, $guests[$key+1]);//push the next guest into the same room
+        } else {//means the next guest stayed in different room
+          array_push($fulls, $same_rooms);//push the guest with same room into the array of normal rate guests
+          $same_rooms = [];//reset the same room array
         }
-        // $content .= "<tr>
-        // <td></td>
-        // <td>".$currentRoom.".".$guest->name."</td>
-        // <td></td>
-        // <td></td>
-        // <td>".number_format($guest->roomType->monthly_rate)."</td>
-        // <td>".number_format($totalPrice)."</td>
-        // </tr>";
         
       } else { //if stayed less than 30 days
         
@@ -666,27 +662,24 @@ class InvoiceController extends Controller
         }
 
         if(isset($guests[$key+1]) && $guests[$key+1]->room_number == $currentRoom){
-          //$same_rooms .= "/".$guests[$key+1]->name;
+          
           array_push($prorate_same_rooms, $guests[$key+1]);
         } else {
           array_push($prorates, $prorate_same_rooms);
           $prorate_same_rooms = [];
         }
 
-        // array_push($prorates, $guest);
       }
 
     }
-    
+    //print normal rate
     for($x = 0;$x < sizeof($fulls);$x++){
       $totalPrice = $fulls[$x][0]->roomType->monthly_rate;
       $sum += $totalPrice;
       $room_guests = "";
-      
-      for($y=0;$y<sizeof($fulls[$x]);$y++){
-        if($room_guests == ""){
-          $room_guests = $fulls[$x][$y]->name;
-          $content .= "<tr>
+
+      if($x == 0){//print the type of the initial room type 
+        $content .= "<tr>
           <td></td>
           <td></td>
           <td></td>
@@ -694,10 +687,56 @@ class InvoiceController extends Controller
           <td></td>
           <td></td>
           </tr>";
+        $current_roomtype = $fulls[$x][0]->roomType->id;//set the current room type
+        $current_roomLocation = $fulls[$x][0]->room_location;
+      }
+
+      for($y=0;$y<sizeof($fulls[$x]);$y++){
+        if($room_guests == ""){
+          $room_guests = $fulls[$x][$y]->name;
+          // $content .= "<tr>
+          // <td></td>
+          // <td></td>
+          // <td></td>
+          // <td>".$fulls[$x][0]->roomType->room_type."</td>
+          // <td></td>
+          // <td></td>
+          // </tr>";
+          if($column_count >= 30){
+            $column_count = 0;
+            
+            //next page
+          }
+          
         } else {
           $room_guests .= "/".$fulls[$x][$y]->name;
         }
       }
+
+      if($fulls[$x][0]->room_location != $current_roomLocation){
+        $content .= "<tr>
+          <th>2.</th>
+          <th>".$fulls[$x][0]->location->name."</th>
+          <th>".$fulls[$x][0]->location->capacity."</th>
+          <th></th>
+          <th></th>
+          <th></th>
+          </tr>";
+          $current_roomLocation = $fulls[$x][0]->room_location;
+      }
+
+      if($fulls[$x][0]->roomType->id != $current_roomtype){
+        $content .= "<tr>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td>".$fulls[$x][0]->roomType->room_type."</td>
+          <td></td>
+          <td></td>
+          </tr>";
+          $current_roomtype = $fulls[$x][0]->roomType->id;
+      }
+
       $content .= "<tr>
         <td></td>
         <td>".$fulls[$x][0]->room_number.".".$room_guests."</td>
@@ -706,8 +745,13 @@ class InvoiceController extends Controller
         <td>".number_format($fulls[$x][0]->roomType->monthly_rate)."</td>
         <td>".number_format($totalPrice)."</td>
         </tr>";
+      if($column_count >= 30){
+        $column_count = 0;
+        
+        //next page
+      }
     }
-
+    
     //print prorate
     for($x = 0;$x < sizeof($prorates); $x++){
       $occ_start = new DateTime($prorates[$x][0]->entry_date);
@@ -715,8 +759,15 @@ class InvoiceController extends Controller
       $occupancy = date_diff($occ_start,$occ_end)->format("%a") + 1;
       $totalPrice = $prorates[$x][0]->roomType->daily_rate * $occupancy;
       $sum += $totalPrice;
+      $prorate_guests = "";
       
       for($y = 0;$y < sizeof($prorates[$x]);$y++){
+
+        if($prorate_guests == ""){
+          $prorate_guests = $prorates[$x][$y]->name;
+        } else {
+          $prorate_guests = $prorate_guests.'/'.$prorates[$x][$y]->name;
+        }
 
         if($x == 0){
           $content .= "<tr>
@@ -727,6 +778,7 @@ class InvoiceController extends Controller
           <td>".number_format($prorates[$x][$y]->roomType->daily_rate)."</td>
           <td>".number_format($totalPrice)."</td>
           </tr>";
+          
           continue;
         }
 
@@ -738,6 +790,7 @@ class InvoiceController extends Controller
           <td>".number_format($prorates[$x][$y]->roomType->daily_rate)."</td>
           <td>".number_format($totalPrice)."</td>
           </tr>";
+        
       }
       
     }
@@ -781,10 +834,6 @@ class InvoiceController extends Controller
     $newInvoice->dueDate = $dueDate;
     $newInvoice->room_location = $locationID;
     $newInvoice->save();
-
-    $mpdf = new \Mpdf\Mpdf([
-    'default_font' => 'times'
-    ]);
 
     $mpdf->WriteHTML($content);
 
