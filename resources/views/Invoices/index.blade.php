@@ -18,7 +18,7 @@
         @if($invoice_details -> isEmpty())
             <a href="/invoice/settings">Please set up the invoice details by clicking here</a>
         @else
-            {!! Form::open(['action' => 'InvoiceController@generateInvoice', 'method' => 'POST']) !!}
+            {!! Form::open(['action' => 'InvoiceController@gen_Invoice', 'method' => 'POST']) !!}
                 <div class="form-group">
                     {{Form::label('startDate', 'Start Date')}}
                     {{Form::date('startDate','',['class'=>'form-control'])}}

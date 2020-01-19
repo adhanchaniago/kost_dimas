@@ -54,8 +54,8 @@ Route::post('/attendance/showRecord','AttendanceController@showRecord');
 
 Route::get('/invoice','InvoiceController@index');
 
-Route::post('/invoice/create','InvoiceController@generateInvoice');
-// Route::post('/invoice/create','InvoiceController@gen_Invoice');
+// Route::post('/invoice/create','InvoiceController@generateInvoice');
+Route::post('/invoice/create','InvoiceController@gen_Invoice');
 
 Route::get('/invoice/settings','InvoiceController@enterSettings');
 

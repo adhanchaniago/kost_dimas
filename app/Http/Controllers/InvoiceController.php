@@ -522,13 +522,49 @@ class InvoiceController extends Controller
     $locationID = $request -> input('locationID');
     $kertamukti = Location::where('id',$locationID)->where('name','like','%'.'Kertamukti'.'%')->first();
     $kertamukti_ids = Location::where('name','like','%'.'Kertamukti'.'%')->pluck('id')->toArray();
+
+    $room_types = RoomDetail::where('room_location',$request->input('locationID'))->get();
     
     $sum = 0;
-    $guests = Guest::where('room_location', $locationID)->where('deleted_at',NULL)->whereNotNull('entry_date')->whereNotNull('room_number')->orderBy('room_number')->get();
+    $guests = Guest::where('room_location', $locationID)
+      ->where('deleted_at',NULL)
+      ->whereNotNull('entry_date')
+      ->whereNotNull('room_number')
+      ->orderBy('room_number')->get();
     
     if($kertamukti){
-      $guests = Guest::where('room_location', $kertamukti_ids[0])->where('deleted_at', NULL)->orWhere('room_location', $kertamukti_ids[1])->where('deleted_at', NULL)->where('deleted_at',NULL)->whereNotNull('entry_date')->whereNotNull('room_number')->orderBy('room_location')->orderBy('room_type')->get();
+      $guests = Guest::whereIn('room_location', $kertamukti_ids)
+        ->where('deleted_at', NULL)
+        ->whereNotNull('entry_date')
+        ->whereNotNull('room_number')
+        ->orderBy('room_location')
+        ->orderBy('room_type')->get();
     }
+
+    //get guests by room location
+    $guests_array = [];
+    if($kertamukti){
+      foreach($room_types as $key => $value){
+        $guests_by_room_type = Guest::whereIn('room_location', $kertamukti_ids)
+        ->where('deleted_at',NULL)
+        ->where('room_type',$value->id)
+        ->whereNotNull('entry_date')
+        ->whereNotNull('room_number')
+        ->orderBy('room_number')->get();
+        array_push($guests_array,$guests_by_room_type);
+      }
+    } else {
+      foreach($room_types as $key => $value){
+        $guests_by_room_type = Guest::where('room_location', $locationID)
+        ->where('deleted_at',NULL)
+        ->where('room_type',$value->id)
+        ->whereNotNull('entry_date')
+        ->whereNotNull('room_number')
+        ->orderBy('room_number')->get();
+        array_push($guests_array,$guests_by_room_type);
+      }
+    }
+
     $location = Location::where('id', $locationID)->first();
 
     if($request->input('invoiceDetailID') != null){
@@ -617,129 +653,58 @@ class InvoiceController extends Controller
           <th></th>
           <th></th>
       </tr>';
-
-    $currentRoom = 1;
-    $occupant = null;
-    $occStart = null;
-    $occEnd = null;
-    $prorateArray = array();
-    $last = count($guests);
-    $same_rooms = [];
-    $prorate_same_rooms = [];
-
-    foreach($guests as $key => $guest){
-      $test = $guest->entry_date;
-      $occ_start = new DateTime($guest->entry_date);
-      $occ_end = $endDate;
-      $occupancy = date_diff($occ_start,$occ_end)->format("%a") + 1;
-      $currentRoom = $guest->room_number;
-
-      //if stayed more than 30 days, insert guest in same room numbers
-      if($occupancy >= 30){
-        // $totalPrice = $guest->roomType->monthly_rate;
-        // $sum += $totalPrice;
-        
-        if(sizeof($same_rooms) == 0){
-          array_push($same_rooms,$guest);
-        }
-
-        if(isset($guests[$key+1]) && $guests[$key+1]->room_number == $currentRoom){
-          //$same_rooms .= "/".$guests[$key+1]->name;
-          array_push($same_rooms, $guests[$key+1]);
-        } else {
-          array_push($fulls, $same_rooms);
-          $same_rooms = [];
-        }
-        // $content .= "<tr>
-        // <td></td>
-        // <td>".$currentRoom.".".$guest->name."</td>
-        // <td></td>
-        // <td></td>
-        // <td>".number_format($guest->roomType->monthly_rate)."</td>
-        // <td>".number_format($totalPrice)."</td>
-        // </tr>";
-        
-      } else { //if stayed less than 30 days
-        
-        if(sizeof($prorate_same_rooms == 0)){
-          array_push($prorate_same_rooms, $guest);  
-        }
-
-        if(isset($guests[$key+1]) && $guests[$key+1]->room_number == $currentRoom){
-          //$same_rooms .= "/".$guests[$key+1]->name;
-          array_push($prorate_same_rooms, $guests[$key+1]);
-        } else {
-          array_push($prorates, $prorate_same_rooms);
-          $prorate_same_rooms = [];
-        }
-
-        // array_push($prorates, $guest);
-      }
-
-    }
-    
-    for($x = 0;$x < sizeof($fulls);$x++){
-      $totalPrice = $fulls[$x][0]->roomType->monthly_rate;
-      $sum += $totalPrice;
-      $room_guests = "";
-      
-      for($y=0;$y<sizeof($fulls[$x]);$y++){
-        if($room_guests == ""){
-          $room_guests = $fulls[$x][$y]->name;
-          $content .= "<tr>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td>".$fulls[$x][0]->roomType->room_type."</td>
-          <td></td>
-          <td></td>
-          </tr>";
-        } else {
-          $room_guests .= "/".$fulls[$x][$y]->name;
-        }
-      }
-      $content .= "<tr>
-        <td></td>
-        <td>".$fulls[$x][0]->room_number.".".$room_guests."</td>
+    $name_string = '';
+    $prorate_array = [];
+    for($counter = 0; $counter < sizeof($guests_array); $counter++){
+      $content .= '<tr>
         <td></td>
         <td></td>
-        <td>".number_format($fulls[$x][0]->roomType->monthly_rate)."</td>
-        <td>".number_format($totalPrice)."</td>
-        </tr>";
-    }
-
-    //print prorate
-    for($x = 0;$x < sizeof($prorates); $x++){
-      $occ_start = new DateTime($prorates[$x][0]->entry_date);
-      $occ_end = $endDate;
-      $occupancy = date_diff($occ_start,$occ_end)->format("%a") + 1;
-      $totalPrice = $prorates[$x][0]->roomType->daily_rate * $occupancy;
-      $sum += $totalPrice;
-      
-      for($y = 0;$y < sizeof($prorates[$x]);$y++){
-
-        if($x == 0){
-          $content .= "<tr>
-          <td>2.</td>
-          <td> Prorate ".$occupancy." days in room ".$prorates[$x][$y]->room_number."<br>".$prorates[$x][$y]->name."</td>
-          <td></td>
-          <td></td>
-          <td>".number_format($prorates[$x][$y]->roomType->daily_rate)."</td>
-          <td>".number_format($totalPrice)."</td>
-          </tr>";
+        <td></td>
+        <td>'.$counter.'</td>
+        <td></td>
+        <td></td>
+      </tr>';
+      //normal guests
+      foreach($guests_array[$counter] as $key => $values){
+        $name_string .= '/'.$values->name;
+        $occStart = $values->entry_date < $startDate ? $startDate : $values->entry_date;
+        $occEnd  = $values->exit_date != NULL ? $values->exit_date : $endDate;
+        if(date_diff($occStart,$occEnd)->days < 29){
+          array_push($prorate_array,$values);
           continue;
         }
-
-        $content .= "<tr>
-          <td></td>
-          <td> Prorate ".$occupancy." days in room ".$prorates[$x][$y]->room_number."<br>".$prorates[$x][$y]->name."</td>
-          <td></td>
-          <td></td>
-          <td>".number_format($prorates[$x][$y]->roomType->daily_rate)."</td>
-          <td>".number_format($totalPrice)."</td>
-          </tr>";
+        //if there are no next index, print the row
+        if(!isset($guests_array[$counter][$key+1])){
+          $name_string = ltrim($name_string,'/');
+          $content .= 
+            '<tr>
+              <td></td>
+              <td>'.$values->room_number.'. '.$name_string.'</td>
+              <td></td>
+              <td></td>
+              <td>'.$values->roomType->monthly_rate.'</td>
+              <td>'.$values->roomType->monthly_rate.'</td>
+            </tr>';
+          $name_string = '';
+          continue;
+        }
+        //if the next index have the same room_number
+        if($values->room_number == $guests_array[$counter][$key+1]->room_number){
+          continue;
+        } else {//if next index exist, but in different room number
+          $name_string = ltrim($name_string,'/');
+          $content .= 
+            '<tr>
+              <td></td>
+              <td>'.$values->room_number.'. '.$name_string.'</td>
+              <td></td>
+              <td></td>
+              <td>'.$values->roomType->monthly_rate.'</td>
+              <td>'.$values->roomType->monthly_rate.'</td>
+            </tr>';
+          $name_string = '';
+        }
       }
-      
     }
 
     $content .= "
