@@ -13,7 +13,7 @@
                 <th>ID</th>
                 <th>Attendance</th>
             </tr>
-            @if($guests->isEmpty())
+            @if(count($guests) < 1)
                 <tr>
                     <td colspan="5">
                         <a href="/guests/get_room">There are no guests in this location, Click here to Add guests</a>
@@ -36,7 +36,7 @@
         </table>
         {{Form::hidden('location',$location->id)}}
         {{Form::hidden('_method','POST')}}
-        @if(!$guests->isEmpty())
+        @if(count($guests) > 1)
             {{Form::submit('Submit',['class'=>'btn btn-primary form-control'])}}
         @endif
     {!! Form::close() !!}

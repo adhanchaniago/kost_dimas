@@ -12,7 +12,7 @@
         {!! Form::open(['action' => 'AttendanceController@showRecord', 'method' => 'POST']) !!}
             <div class="form-group">
                 {{Form::label('room_location', 'Room Location')}}
-                @if($locations -> isEmpty())
+                @if(count($locations) < 1)
                     <a href="/locations/create"></a>
                 @else
                     <select name="room_location" class="form-control">
