@@ -508,6 +508,7 @@ class InvoiceController extends Controller
   }
   //new invoice function
   public function gen_Invoice(Request $request){
+    $table_counter = 1;
     $startDate = date_create($request -> input('startDate'));
     if($request -> input('endDate') != null){
       $endDate = date_create($request -> input('endDate'));
@@ -516,33 +517,26 @@ class InvoiceController extends Controller
       $endDate = date_create(date('Y-m-d'));
     }
 
-    $prorates = [];
-    $fulls = [];
+    $prorate_array = [];
+    $guests_array = [];
+    $sum = 0;
 
     $locationID = $request -> input('locationID');
-    $kertamukti = Location::where('id',$locationID)->where('name','like','%'.'Kertamukti'.'%')->first();
-    $kertamukti_ids = Location::where('name','like','%'.'Kertamukti'.'%')->pluck('id')->toArray();
+    // $kertamukti = Location::where('id',$locationID)->where('name','like','%'.'Kertamukti'.'%')->first();
+    // $kertamukti_ids = Location::where('name','like','%'.'Kertamukti'.'%')->pluck('id')->toArray();
 
-    $room_types = RoomDetail::where('room_location',$request->input('locationID'))->get();
-    
-    $sum = 0;
-    $guests = Guest::where('room_location', $locationID)
-      ->where('deleted_at',NULL)
-      ->whereNotNull('entry_date')
-      ->whereNotNull('room_number')
-      ->orderBy('room_number')->get();
-    
-    if($kertamukti){
-      $guests = Guest::whereIn('room_location', $kertamukti_ids)
-        ->where('deleted_at', NULL)
-        ->whereNotNull('entry_date')
-        ->whereNotNull('room_number')
-        ->orderBy('room_location')
-        ->orderBy('room_type')->get();
+    //get kertamukti ids
+    $kertamukti_name_array = ['KM1','KM2','Kertamukti'];
+    $kertamukti_ids = Location::whereIn('name',$kertamukti_name_array)->pluck('id')->toArray();
+    if(in_array($request->input('locationID'),$kertamukti_ids)){
+      $kertamukti = true;
+    } else {
+      $kertamukti = false;
     }
+    
+    $room_types = RoomDetail::where('room_location',$request->input('locationID'))->orderBy('id')->get();
 
     //get guests by room location
-    $guests_array = [];
     if($kertamukti){
       foreach($room_types as $key => $value){
         $guests_by_room_type = Guest::whereIn('room_location', $kertamukti_ids)
@@ -646,7 +640,7 @@ class InvoiceController extends Controller
           <th>Total Price</th>
       </tr>
       <tr>
-          <th>1.</th>
+          <th>'.$table_counter.'.</th>
           <th>'.$location->name.'</th>
           <th>'.$location->capacity.'</th>
           <th></th>
@@ -654,27 +648,29 @@ class InvoiceController extends Controller
           <th></th>
       </tr>';
     $name_string = '';
-    $prorate_array = [];
     for($counter = 0; $counter < sizeof($guests_array); $counter++){
       $content .= '<tr>
         <td></td>
         <td></td>
         <td></td>
-        <td>'.$counter.'</td>
+        <td>'.$room_types[$counter]->room_type.'</td>
         <td></td>
         <td></td>
       </tr>';
-      //normal guests
+      //normal rate guests
       foreach($guests_array[$counter] as $key => $values){
         $name_string .= '/'.$values->name;
-        $occStart = $values->entry_date < $startDate ? $startDate : $values->entry_date;
-        $occEnd  = $values->exit_date != NULL ? $values->exit_date : $endDate;
+        $occStart = $values->entry_date > $startDate ? $startDate : date_create($values->entry_date);
+        $occEnd  = $values->exit_date != NULL ? date_create($values->exit_date) : $endDate;
+        //CHECK for prorates
         if(date_diff($occStart,$occEnd)->days < 29){
           array_push($prorate_array,$values);
+          $name_string = '';
           continue;
         }
         //if there are no next index, print the row
         if(!isset($guests_array[$counter][$key+1])){
+          $sum += $values->roomType->monthly_rate;
           $name_string = ltrim($name_string,'/');
           $content .= 
             '<tr>
@@ -682,8 +678,8 @@ class InvoiceController extends Controller
               <td>'.$values->room_number.'. '.$name_string.'</td>
               <td></td>
               <td></td>
-              <td>'.$values->roomType->monthly_rate.'</td>
-              <td>'.$values->roomType->monthly_rate.'</td>
+              <td>'.number_format($values->roomType->monthly_rate,0,",",".").'</td>
+              <td>'.number_format($values->roomType->monthly_rate,0,",",".").'</td>
             </tr>';
           $name_string = '';
           continue;
@@ -692,6 +688,7 @@ class InvoiceController extends Controller
         if($values->room_number == $guests_array[$counter][$key+1]->room_number){
           continue;
         } else {//if next index exist, but in different room number
+          $sum += $values->roomType->monthly_rate;
           $name_string = ltrim($name_string,'/');
           $content .= 
             '<tr>
@@ -699,13 +696,56 @@ class InvoiceController extends Controller
               <td>'.$values->room_number.'. '.$name_string.'</td>
               <td></td>
               <td></td>
-              <td>'.$values->roomType->monthly_rate.'</td>
-              <td>'.$values->roomType->monthly_rate.'</td>
+              <td>'.number_format($values->roomType->monthly_rate,0,",",".").'</td>
+              <td>'.number_format($values->roomType->monthly_rate,0,",",".").'</td>
             </tr>';
           $name_string = '';
         }
-      }
+      }  
     }
+    
+    //prorate loop
+    $prorate_names = '';
+    for($prorate_counter=0; $prorate_counter < sizeof($prorate_array); $prorate_counter ++){
+        $occStart = $prorate_array[$prorate_counter]->entry_date > $startDate ? $startDate : date_create($prorate_array[$prorate_counter]->entry_date);
+        $occEnd  = $prorate_array[$prorate_counter]->exit_date != NULL ? date_create($prorate_array[$prorate_counter]->exit_date) : $endDate;
+        $occDuration = date_diff($occStart,$occEnd)->days;
+        $totalCharged = $values->roomType->daily_rate * $occDuration;
+        $prorate_names .= '/'.$prorate_array[$prorate_counter]->name;
+        if(!isset($prorate_array[$prorate_counter+1])){
+          $sum += $totalCharged;
+          $table_counter++;
+          $prorate_names = ltrim($prorate_names,'/');
+          $content .= "<tr>
+                  <td>".$table_counter.".</td>
+                  <td> Prorate ".$occDuration." days in room ".$prorate_array[$prorate_counter]->room_number."<br>".$prorate_names."</td>
+                  <td></td>
+                  <td></td>
+                  <td>".number_format($prorate_array[$prorate_counter]->roomType->daily_rate,0,",",".")."</td>
+                  <td>".number_format($totalCharged,0,",",".")."</td>
+                  </tr>";
+          $prorate_names = '';
+          continue;
+        }
+
+        if($prorate_array[$prorate_counter]->room_number == $prorate_array[$prorate_counter+1]->room_number){
+          continue;
+        } else {
+          $sum += $totalCharged;
+          $table_counter++;
+          $prorate_names = ltrim($prorate_names,'/');
+          $content .= "<tr>
+                  <td>".$table_counter.".</td>
+                  <td> Prorate ".$occDuration." days in room ".$prorate_array[$prorate_counter]->room_number."<br>".$prorate_names."</td>
+                  <td></td>
+                  <td></td>
+                  <td>".number_format($prorate_array[$prorate_counter]->roomType->daily_rate,0,",",".")."</td>
+                  <td>".number_format($totalCharged,0,",",".")."</td>
+                  </tr>";
+          $prorate_names = '';
+        }
+        
+      }
 
     $content .= "
     <tr>
