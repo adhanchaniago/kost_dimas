@@ -73,7 +73,18 @@ class InvoiceController extends Controller
 
     public function receipt_index(){
         $invoices = Invoice::all();
-        return view('Receipts.index')->with('invoices',$invoices);
+        $months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+        $current_year = date('Y');
+        $year = [];
+        $locations = Location::where('deleted_at',NULL)->get();
+        for($counter = 2019; $counter <= $current_year; $counter++){
+          array_push($year,$counter);
+        }
+        return view('Receipts.index')->with([
+          'invoices'    => $invoices,
+          'years'       => $year,
+          'months'      => $months,
+          'locations'   => $locations]);
     }
 
     function numberToRoman($number) {
@@ -793,9 +804,14 @@ class InvoiceController extends Controller
   }
 
   public function generateReceipt(Request $request){
-    $invoice = Invoice::where('id', $request->input('invoiceID'))->first();
+    $month = $request->input('month');
+    $year = $request->input('year');
+    $start_date = date_create($year.'-'.$month.'-'.'1');
+    // $end_date = $month == 2 ? date_create($year.'-'.$month.'-'.'28') : date_create($year.'-'.$month.'-'.'30');
+    
+    $invoice = Invoice::where('room_location',$request->input('locationID'))->where('startDate',$start_date)->orderBy('created_at','desc')->first();
     $invoiceDetail = InvoiceDetail::where('id', $invoice->invoiceDetailID)->first();
-    $location = Location::where('id',$invoice->room_location)->first();
+    $location = Location::where('id',$request->input('locationID'))->first();
     $endDate = new Datetime($invoice->endDate);
     $invoiceCode = $location->code.'. / T.'.$this->numberToRoman(date_format($endDate, 'm')).'';
     $content =
