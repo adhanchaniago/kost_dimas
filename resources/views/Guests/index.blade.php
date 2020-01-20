@@ -33,7 +33,7 @@
             <th>Room</th>
             <th>Details</th>
         </tr>
-        @if($guests -> isEmpty())
+        @if(count($guests) < 1)
             <tr>
                 <td colspan="5">There are no guests</td>
             </tr>

@@ -17,7 +17,7 @@
         {!! Form::open(['action' => 'AttendanceController@atd_form', 'method' => 'POST']) !!}
             <div class="form-group">
                 {{Form::label('room_location', 'Room Location')}}
-                @if($locations -> isEmpty())
+                @if(count($locations) < 1)
                     <a href="/locations/create">There are no locations listed, Click here to Add Locations</a>
                 @else
                     <select class="form-control" name="room_location">

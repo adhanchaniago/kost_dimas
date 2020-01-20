@@ -15,7 +15,7 @@
     <div class="col-sm-2"></div>
 
     <div class="col-sm-8">
-        @if($invoice_details -> isEmpty())
+        @if(count($invoice_details) < 1)
             <a href="/invoice/settings">Please set up the invoice details by clicking here</a>
         @else
             {!! Form::open(['action' => 'InvoiceController@generateInvoice', 'method' => 'POST']) !!}

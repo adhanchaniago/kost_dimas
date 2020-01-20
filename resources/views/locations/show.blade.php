@@ -30,7 +30,7 @@
             <?php 
                 $counter = ($guests->currentpage()-1)* $guests->perpage() + 1;
             ?>
-            @if($guests->isEmpty())
+            @if(count($guests) < 1)
                 @if($error_message == null)
                     <tr>
                         <td colspan="5">

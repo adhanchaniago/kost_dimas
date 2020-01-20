@@ -12,7 +12,7 @@
     <div class="col-sm-2"></div>
 
     <div class="col-sm-8">
-        @if($invoices->isEmpty())
+        @if(count($invoices) < 1)
             <a href="/invoice">Click here to create an invoice first</a>
         @else
             {!! Form::open(['action' => 'InvoiceController@generateReceipt', 'method' => 'POST']) !!}

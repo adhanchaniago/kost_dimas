@@ -31,7 +31,7 @@ class AttendanceController extends Controller
         $location = Location::find($room_location);
         $guests = Guest::where('room_location',$room_location)->where('exit_date',NULL)->where('deleted_at',NULL)->get();
 
-        if($attendances->isEmpty()){
+        if(count($attendances) < 1){
             return view('attendance.form')->with('guests',$guests)->with('location',$location);
         }
         else{

@@ -14,7 +14,7 @@
                 <th>Stay Duration</th>
                 <th style="display:none;">Exit Date</th>
             </tr>
-            @if($attendances -> isEmtpy())
+            @if(count($attendances) < 1)
                 <a href="/attendance">No Attendance are made yet</a>
             @else
                 @foreach($attendances as $attendance)

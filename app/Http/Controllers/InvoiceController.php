@@ -38,7 +38,7 @@ class InvoiceController extends Controller
         $locations = Location::where('deleted_at',NULL)->get();
         $invoice_details = InvoiceDetail::orderBy('created_at','desc')->where('deleted_at',NULL)->get();
         $guests = Guest::where('deleted_at',NULL)->get();
-        if($guests->isEmpty()){
+        if(count($guests) < 1){
           return redirect('guests');
         } else {
           return view('Invoices.index')->with('locations',$locations)->with('invoice_details',$invoice_details);

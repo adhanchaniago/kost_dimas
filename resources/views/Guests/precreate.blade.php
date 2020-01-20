@@ -4,7 +4,7 @@
 @section('content')
   <h1>Location for New Guest</h1>
   <hr>
-  @if($locations -> isEmpty())
+  @if(count($locations) < 1)
     <div class="row">
       <div class="col-sm-12">
         <center>

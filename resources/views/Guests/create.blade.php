@@ -35,7 +35,7 @@
     <div class="form-group">
       {{Form::label('room_type', 'Room Type')}}
       <select class="form-control" name="room_type">
-          @if($room_details -> isEmpty())
+          @if(count($room_details) < 1)
             <option value=0>There are no room details</option>
           @else
             @foreach($room_details as $room_detail)
