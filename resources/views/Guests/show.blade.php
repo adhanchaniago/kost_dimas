@@ -11,6 +11,7 @@
             <th>ID Card</th>
             <th>Entry Date</th>
             <th>Exit Date</th>
+            <th>Location</th>
             <th>Room Number</th>
             
         </tr>
@@ -20,6 +21,7 @@
             <td><img src="../../../<?php echo $guest->id_path; ?>" style="height:200px;width:300px;" alt="ID Picture"></td>
             <td>{{$guest->entry_date}}</td>
             <td>{{$guest->exit_date}}</td>
+            <td>{{$guest->location->name}}</td>
             <td>{{$guest->room_number}}</td>
             
         </tr>
