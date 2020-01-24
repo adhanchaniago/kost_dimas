@@ -708,7 +708,7 @@ class InvoiceController extends Controller
         $occStart = $values->entry_date > $startDate ? $startDate : date_create($values->entry_date);
         $occEnd  = $values->exit_date != NULL ? date_create($values->exit_date) : $endDate;
         //CHECK for prorates
-        if(date_diff($occStart,$occEnd)->days < 29){
+        if(date_diff($occStart,$occEnd)->days < 29 || date_diff($startDate,$occEnd)->days < 29){
           array_push($prorate_array,$values);
           $name_string = '';
           continue;
@@ -754,7 +754,7 @@ class InvoiceController extends Controller
     for($prorate_counter=0; $prorate_counter < sizeof($prorate_array); $prorate_counter ++){
       $occStart = $prorate_array[$prorate_counter]->entry_date > $startDate ? $startDate : date_create($prorate_array[$prorate_counter]->entry_date);
       $occEnd  = $prorate_array[$prorate_counter]->exit_date != NULL ? date_create($prorate_array[$prorate_counter]->exit_date) : $endDate;
-      $occDuration = date_diff($occStart,$occEnd)->days;
+      $occDuration = date_diff($occStart,$occEnd)->days < 29 ? date_diff($occStart,$occEnd)->days : date_diff($startDate,$occEnd)->days;
       $totalCharged = $values->roomType->daily_rate * $occDuration;
       $prorate_names .= '/'.$prorate_array[$prorate_counter]->name;
       if(!isset($prorate_array[$prorate_counter+1])){
@@ -822,7 +822,7 @@ class InvoiceController extends Controller
           $occStart = $values->entry_date > $startDate ? $startDate : date_create($values->entry_date);
           $occEnd  = $values->exit_date != NULL ? date_create($values->exit_date) : $endDate;
           //CHECK for prorates
-          if(date_diff($occStart,$occEnd)->days < 29){
+          if(date_diff($occStart,$occEnd)->days < 29 || date_diff($startDate,$occEnd)->days < 29){
             array_push($prorate_array,$values);
             $name_string = '';
             continue;
@@ -868,7 +868,7 @@ class InvoiceController extends Controller
       for($prorate_counter=0; $prorate_counter < sizeof($prorate_array); $prorate_counter ++){
         $occStart = $prorate_array[$prorate_counter]->entry_date > $startDate ? $startDate : date_create($prorate_array[$prorate_counter]->entry_date);
         $occEnd  = $prorate_array[$prorate_counter]->exit_date != NULL ? date_create($prorate_array[$prorate_counter]->exit_date) : $endDate;
-        $occDuration = date_diff($occStart,$occEnd)->days;
+        $occDuration = date_diff($occStart,$occEnd)->days < 29 ? date_diff($occStart,$occEnd)->days : date_diff($startDate,$occEnd)->days;
         $totalCharged = $values->roomType->daily_rate * $occDuration;
         $prorate_names .= '/'.$prorate_array[$prorate_counter]->name;
         if(!isset($prorate_array[$prorate_counter+1])){
