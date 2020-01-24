@@ -705,8 +705,13 @@ class InvoiceController extends Controller
       //normal rate guests
       foreach($guests_array[$counter] as $key => $values){
         $name_string .= '/'.$values->name;
-        $occStart = $values->entry_date > $startDate ? $startDate : date_create($values->entry_date);
+        $occStart = date_create($values->entry_date) > $startDate ? $startDate : date_create($values->entry_date);
         $occEnd  = $values->exit_date != NULL ? date_create($values->exit_date) : $endDate;
+        //CHECK for exiting guests
+        if($values->exit_date != NULL && date_create($values->exit_date) < $startDate){
+          $name_string = '';
+          continue;
+        }
         //CHECK for prorates
         if(date_diff($occStart,$occEnd)->days < 29 || date_diff($startDate,$occEnd)->days < 29){
           array_push($prorate_array,$values);
@@ -819,8 +824,13 @@ class InvoiceController extends Controller
         //normal rate guests
         foreach($guests_array[$counter] as $key => $values){
           $name_string .= '/'.$values->name;
-          $occStart = $values->entry_date > $startDate ? $startDate : date_create($values->entry_date);
+          $occStart = date_create($values->entry_date) > $startDate ? $startDate : date_create($values->entry_date);
           $occEnd  = $values->exit_date != NULL ? date_create($values->exit_date) : $endDate;
+          //CHECK for exiting guests
+          if($values->exit_date != NULL && date_create($values->exit_date) < $startDate){
+            $name_string = '';
+            continue;
+          }
           //CHECK for prorates
           if(date_diff($occStart,$occEnd)->days < 29 || date_diff($startDate,$occEnd)->days < 29){
             array_push($prorate_array,$values);
